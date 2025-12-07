@@ -8,14 +8,10 @@ import axios, {
   RawAxiosRequestHeaders
 } from 'axios';
 
-// const client = axios.create({
-//   baseURL: '/'
-// })
-
 const makeAxiosCall = async () => {
   try {
     console.log('attempting axios call...');
-    const response = await axios.get('/api/');
+    const response = await axios.get('/api/users');
     console.log('response:', response);
   } catch (error) {
     console.error('error:', error)
