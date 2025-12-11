@@ -1,5 +1,8 @@
 import { Box, Button, TextField } from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { ChangeEvent, FormEventHandler, useState } from "react";
+import { useRegister } from "../api/utils";
+import { isDisabled } from "@testing-library/user-event/dist/utils";
 
 type RegistrationFormData = {
   email: string;
@@ -12,6 +15,8 @@ export const RegistrationForm = () => {
     password: "",
   });
 
+  const { status, errMessage, data, attemptRegister } = useRegister();
+
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -21,6 +26,10 @@ export const RegistrationForm = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("submitting registration form w/:", formData);
+    attemptRegister({
+      email: formData.email,
+      password: formData.password,
+    });
   };
 
   return (
@@ -39,6 +48,7 @@ export const RegistrationForm = () => {
         name="email"
         value={formData.email}
         onChange={handleChange}
+        disabled={status === "loading"}
         fullWidth
         required
       />
@@ -47,12 +57,18 @@ export const RegistrationForm = () => {
         name="password"
         value={formData.password}
         onChange={handleChange}
+        disabled={status === "loading"}
         fullWidth
         required
       />
-      <Button type="submit" variant="contained">
+      <LoadingButton
+        type="submit"
+        variant="contained"
+        loading={status === "loading"}
+        disabled={status === "loading"}
+      >
         Register
-      </Button>
+      </LoadingButton>
     </Box>
   );
 };
