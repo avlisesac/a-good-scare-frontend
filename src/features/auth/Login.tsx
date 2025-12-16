@@ -1,21 +1,20 @@
 import { Box, Button, TextField } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { ChangeEvent, FormEventHandler, useState } from "react";
-import { useRegister } from "../api/utils";
-import { isDisabled } from "@testing-library/user-event/dist/utils";
+import { useLogin, useRegister } from "../api/utils";
 
-type RegistrationFormData = {
+type LoginFormData = {
   email: string;
   password: string;
 };
 
-export const RegistrationForm = () => {
-  const [formData, setFormData] = useState<RegistrationFormData>({
+export const Login = () => {
+  const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
 
-  const { status, errMessage, data, attemptRegister } = useRegister();
+  const { status, errMessage, data, attemptLogin } = useLogin();
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -25,8 +24,8 @@ export const RegistrationForm = () => {
   };
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("submitting registration form w/:", formData);
-    attemptRegister({
+    console.log("submitting login form w/:", formData);
+    attemptLogin({
       email: formData.email,
       password: formData.password,
     });
@@ -67,7 +66,7 @@ export const RegistrationForm = () => {
         loading={status === "loading"}
         disabled={status === "loading"}
       >
-        Register
+        Login
       </LoadingButton>
     </Box>
   );
