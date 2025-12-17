@@ -20,6 +20,13 @@ type LoginResponse = {};
 
 const cookies = new Cookies();
 
+const API_BASE = process.env.REACT_APP_API_URL ?? "";
+
+const api = axios.create({
+  baseURL: API_BASE,
+  withCredentials: true,
+});
+
 export const useRegister = () => {
   const [status, setStatus] = useState<ApiStatus>("idle");
   const [data, setData] = useState<RegistrationResponse>();
@@ -36,7 +43,7 @@ export const useRegister = () => {
     };
     try {
       setStatus("loading");
-      const response = await axios(configuration);
+      const response = await api(configuration);
       console.log("response:", response);
       setStatus("success");
       setData(data);
@@ -76,7 +83,7 @@ export const useLogin = () => {
     };
     try {
       setStatus("loading");
-      const response = await axios(configuration);
+      const response = await api(configuration);
       console.log("response:", response);
       setStatus("success");
       setData(response);
@@ -118,7 +125,7 @@ export const useAuthEndpoint = () => {
       setStatus("loading");
       setErrMessage("");
       setData(undefined);
-      const response = await axios(configuration);
+      const response = await api(configuration);
       console.log("response:", response);
       setStatus("success");
       setData(response.data.message);
