@@ -1,9 +1,7 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import Cookies from "universal-cookie";
-
-type ApiStatus = "idle" | "loading" | "success" | "error";
+import { useAsyncAction } from "./useAsyncAction";
 
 type RegistrationInput = {
   email: string;
@@ -18,8 +16,6 @@ type LoginInput = {
 type RegistrationResponse = {};
 type LoginResponse = {};
 
-const cookies = new Cookies();
-
 const API_BASE = process.env.REACT_APP_API_URL ?? "";
 
 const api = axios.create({
@@ -27,123 +23,62 @@ const api = axios.create({
   withCredentials: true,
 });
 
-export const useRegister = () => {
-  const [status, setStatus] = useState<ApiStatus>("idle");
-  const [data, setData] = useState<RegistrationResponse>();
-  const [errMessage, setErrMessage] = useState("");
-  const navigate = useNavigate();
-
-  const attemptRegister = async (input: RegistrationInput) => {
-    const configuration: AxiosRequestConfig = {
-      method: "post",
-      url: "/api/register",
-      data: {
-        ...input,
-      },
-    };
-    try {
-      setStatus("loading");
-      const response = await api(configuration);
-      console.log("response:", response);
-      setStatus("success");
-      setData(data);
-      navigate("/login");
-    } catch (error) {
-      setStatus("error");
-      console.error("error:", error);
-      if (axios.isAxiosError(error)) {
-        setErrMessage(error.message);
-      } else {
-        setErrMessage("An unknown error occured during registration.");
-      }
-    }
+export const register = async (
+  input: RegistrationInput
+): Promise<RegistrationResponse> => {
+  const configuration: AxiosRequestConfig = {
+    method: "post",
+    url: "/api/register",
+    data: {
+      ...input,
+    },
   };
+  const response = await api(configuration);
+  return response;
+};
 
-  return {
-    status,
-    data,
-    errMessage,
-    attemptRegister,
+export const login = async (input: LoginInput): Promise<AxiosResponse> => {
+  const configuration: AxiosRequestConfig = {
+    method: "post",
+    url: "/api/login",
+    data: {
+      ...input,
+    },
   };
+  const response = await api(configuration);
+  return response;
+};
+
+export const callAuthEndpoint = async (input: String): Promise<String> => {
+  const configuration: AxiosRequestConfig = {
+    method: "get",
+    url: "/api/auth-endpoint",
+    headers: {
+      Authorization: `Bearer ${input}`,
+    },
+  };
+  const response = await api(configuration);
+  return response.data.message;
 };
 
 export const useLogin = () => {
-  const [status, setStatus] = useState<ApiStatus>("idle");
-  const [data, setData] = useState<LoginResponse>();
-  const [errMessage, setErrMessage] = useState("");
-  const navigate = useNavigate();
+  const { execute, ...state } = useAsyncAction<LoginInput, AxiosResponse>(
+    login
+  );
+  return { ...state, attemptLogin: execute };
+};
 
-  const attemptLogin = async (input: LoginInput) => {
-    const configuration: AxiosRequestConfig = {
-      method: "post",
-      url: "/api/login",
-      data: {
-        ...input,
-      },
-    };
-    try {
-      setStatus("loading");
-      const response = await api(configuration);
-      console.log("response:", response);
-      setStatus("success");
-      setData(response);
-      cookies.set("TOKEN", response.data.token, { path: "/" });
-      navigate("/");
-    } catch (error) {
-      setStatus("error");
-      console.error("error:", error);
-      if (axios.isAxiosError(error)) {
-        setErrMessage(error.message);
-      } else {
-        setErrMessage("An unknown error occured during login.");
-      }
-    }
-  };
-
-  return {
-    status,
-    data,
-    errMessage,
-    attemptLogin,
-  };
+export const useRegister = () => {
+  const { execute, ...state } = useAsyncAction<
+    RegistrationInput,
+    RegistrationResponse
+  >(register);
+  return { ...state, attemptRegister: execute };
 };
 
 export const useAuthEndpoint = () => {
-  const [status, setStatus] = useState<ApiStatus>("idle");
-  const [data, setData] = useState<string>();
-  const [errMessage, setErrMessage] = useState("");
-
-  const callAuthEndpoint = async (token: String) => {
-    const configuration: AxiosRequestConfig = {
-      method: "get",
-      url: "/api/auth-endpoint",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    };
-    try {
-      setStatus("loading");
-      setErrMessage("");
-      setData(undefined);
-      const response = await api(configuration);
-      console.log("response:", response);
-      setStatus("success");
-      setData(response.data.message);
-    } catch (error) {
-      setStatus("error");
-      console.error("error:", error);
-      if (axios.isAxiosError(error)) {
-        setErrMessage(error.message);
-      } else {
-        setErrMessage("An unknown error occured during login.");
-      }
-    }
-  };
-
-  return {
-    status,
-    data,
-    errMessage,
-    callAuthEndpoint,
-  };
+  const { execute, ...state } = useAsyncAction<String, String>(
+    callAuthEndpoint
+  );
+  return { ...state, callAuthEndpoint: execute };
 };

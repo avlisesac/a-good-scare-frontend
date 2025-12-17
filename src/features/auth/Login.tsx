@@ -1,34 +1,50 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Alert, Box, Button, TextField } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { ChangeEvent, FormEventHandler, useState } from "react";
+import { ChangeEvent, FormEventHandler, useEffect, useState } from "react";
 import { useLogin, useRegister } from "../api/utils";
+import Cookies from "universal-cookie";
+import { useNavigate } from "react-router";
 
 type LoginFormData = {
   email: string;
   password: string;
 };
 
+const cookies = new Cookies();
+
 export const Login = () => {
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
-
-  const { status, errMessage, data, attemptLogin } = useLogin();
+  const { status, err, result, attemptLogin } = useLogin();
+  const [loginError, setLoginError] = useState<String | null>(null);
+  const navigate = useNavigate();
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    setLoginError(null);
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("submitting login form w/:", formData);
-    attemptLogin({
-      email: formData.email,
-      password: formData.password,
-    });
+    setLoginError(null);
+    try {
+      const result = await attemptLogin({
+        email: formData.email,
+        password: formData.password,
+      });
+      if (result.data?.token) {
+        cookies.set("TOKEN", result.data.token, { path: "/" });
+        navigate("/");
+      }
+    } catch (err) {
+      console.error(err);
+      setLoginError(err as String);
+    }
   };
 
   return (
@@ -60,6 +76,7 @@ export const Login = () => {
         fullWidth
         required
       />
+      {loginError && <Alert severity="error">{loginError}</Alert>}
       <LoadingButton
         type="submit"
         variant="contained"

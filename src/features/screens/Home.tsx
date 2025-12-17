@@ -16,6 +16,7 @@ import { useNavigate } from "react-router";
 import Cookies from "universal-cookie";
 import { useAuthEndpoint } from "../api/utils";
 import { LoadingButton } from "@mui/lab";
+import { AxiosResponse } from "axios";
 
 const LoginFeedback = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   let severity:
@@ -34,8 +35,8 @@ export const Home = () => {
   const token = cookies.get("TOKEN");
   console.log("token:", token);
   const [tokenState, setTokenState] = useState(token);
-  const { data, status, errMessage, callAuthEndpoint } = useAuthEndpoint();
-  const [messageToDisplay, setMessageToDisplay] = useState<string>();
+  const { result, status, err, callAuthEndpoint } = useAuthEndpoint();
+  const [messageToDisplay, setMessageToDisplay] = useState<String | null>(null);
 
   const navigate = useNavigate();
 
@@ -44,21 +45,22 @@ export const Home = () => {
     navigate("/");
   };
 
+  const handleAuthCall = async (token: String) => {
+    let newMessageToDisplay: String | null = null;
+    try {
+      const result = await callAuthEndpoint(token);
+      console.log("result:", result);
+      newMessageToDisplay = result;
+    } catch (errLocal) {
+      console.error("errLocal:", errLocal);
+      newMessageToDisplay = errLocal as String;
+    }
+    setMessageToDisplay(newMessageToDisplay);
+  };
+
   useEffect(() => {
     setTokenState(token);
   }, [token]);
-
-  useEffect(() => {
-    setMessageToDisplay(data);
-  }, [data]);
-
-  useEffect(() => {
-    setMessageToDisplay("Unauthorized!");
-  }, [errMessage]);
-
-  useEffect(() => {
-    setMessageToDisplay(undefined);
-  }, []);
 
   return (
     <Grid container spacing={2}>
@@ -82,7 +84,9 @@ export const Home = () => {
       <Grid size={12}>
         <LoadingButton
           variant="outlined"
-          onClick={() => callAuthEndpoint(token)}
+          onClick={() => {
+            handleAuthCall(token);
+          }}
           loading={status === "loading"}
           disabled={status === "loading"}
         >
@@ -91,10 +95,10 @@ export const Home = () => {
       </Grid>
       <Dialog
         open={!!messageToDisplay}
-        onClose={() => setMessageToDisplay(undefined)}
+        onClose={() => setMessageToDisplay(null)}
       >
         <DialogContent>
-          <DialogContentText color={errMessage ? "red" : "green"}>
+          <DialogContentText color={err ? "red" : "green"}>
             {messageToDisplay}
           </DialogContentText>
         </DialogContent>

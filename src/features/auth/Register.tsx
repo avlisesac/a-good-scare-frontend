@@ -1,7 +1,8 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Alert, Box, Button, TextField } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { ChangeEvent, FormEventHandler, useState } from "react";
 import { useRegister } from "../api/utils";
+import { useNavigate } from "react-router";
 
 type RegistrationFormData = {
   email: string;
@@ -13,22 +14,29 @@ export const Register = () => {
     email: "",
     password: "",
   });
-
-  const { status, errMessage, data, attemptRegister } = useRegister();
+  const { status, err, result, attemptRegister } = useRegister();
+  const [registerError, setRegisterError] = useState<String | null>(null);
+  const navigate = useNavigate();
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = event.target;
+    setRegisterError(null);
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("submitting registration form w/:", formData);
-    attemptRegister({
-      email: formData.email,
-      password: formData.password,
-    });
+    try {
+      const result = await attemptRegister({
+        email: formData.email,
+        password: formData.password,
+      });
+      navigate("/login");
+    } catch (err) {
+      setRegisterError(err as String);
+    }
   };
 
   return (
@@ -60,6 +68,7 @@ export const Register = () => {
         fullWidth
         required
       />
+      {registerError && <Alert severity="error">{registerError}</Alert>}
       <LoadingButton
         type="submit"
         variant="contained"
