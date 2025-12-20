@@ -17,6 +17,7 @@ import Cookies from "universal-cookie";
 import { useAuthEndpoint } from "../api/utils";
 import { LoadingButton } from "@mui/lab";
 import { AxiosResponse } from "axios";
+import { MovieSearch } from "../search/MovieSearch";
 
 const LoginFeedback = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   let severity:
@@ -69,6 +70,9 @@ export const Home = () => {
       </Grid>
       <Grid size={12}>
         <LoginFeedback isLoggedIn={!!token} />
+      </Grid>
+      <Grid size={12}>
+        <MovieSearch />
       </Grid>
       <Grid>
         <Link href="/register">Register</Link>
