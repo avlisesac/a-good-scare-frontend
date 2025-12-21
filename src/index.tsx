@@ -8,22 +8,26 @@ import { Register } from "./features/auth/Register";
 import { Login } from "./features/auth/Login";
 import { Container } from "@mui/material";
 import { Protected } from "./features/screens/Protected";
+import { AGSAppBar } from "./features/ui/AGSAppBar";
+import { AuthProvider } from "./features/context/AuthContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Container>
+    <AuthProvider>
+      <BrowserRouter>
         <Routes>
-          <Route index element={<Home />} />
-          <Route path="register" element={<Register />} />
-          <Route path="login" element={<Login />} />
-          <Route path="protected" element={<Protected />} />
+          <Route element={<AGSAppBar />}>
+            <Route index element={<Home />} />
+            <Route path="register" element={<Register />} />
+            <Route path="login" element={<Login />} />
+            <Route path="protected" element={<Protected />} />
+          </Route>
         </Routes>
-      </Container>
-    </BrowserRouter>
+      </BrowserRouter>
+    </AuthProvider>
   </React.StrictMode>
 );
 

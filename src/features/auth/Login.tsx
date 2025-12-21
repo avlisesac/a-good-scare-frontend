@@ -1,9 +1,10 @@
-import { Alert, Box, Button, TextField } from "@mui/material";
+import { Alert, Box, TextField, Typography } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { ChangeEvent, FormEventHandler, useEffect, useState } from "react";
-import { useLogin, useRegister } from "../api/utils";
+import { ChangeEvent, useState } from "react";
+import { useLogin } from "../api/utils";
 import Cookies from "universal-cookie";
 import { useNavigate } from "react-router";
+import { useAuth } from "../context/AuthContext";
 
 type LoginFormData = {
   email: string;
@@ -20,6 +21,7 @@ export const Login = () => {
   const { status, err, result, attemptLogin } = useLogin();
   const [loginError, setLoginError] = useState<String | null>(null);
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -28,6 +30,10 @@ export const Login = () => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+  // TODO:
+  // - add avatar w/ letter in appbar
+  // - make the avatar a button to open a dropdown w/ a logout button
+  // - Investigate httponly cookies
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("submitting login form w/:", formData);
@@ -40,6 +46,11 @@ export const Login = () => {
       if (result.data?.token) {
         cookies.set("TOKEN", result.data.token, { path: "/" });
         navigate("/");
+      }
+      const user = result.data?.user;
+      console.log("user (Login):", user);
+      if (user) {
+        setUser(user);
       }
     } catch (err) {
       console.error(err);
@@ -85,6 +96,14 @@ export const Login = () => {
       >
         Login
       </LoadingButton>
+      <Box
+        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+      >
+        <Typography>No account yet?</Typography>
+        <Typography component="a" href="/register">
+          Register here!
+        </Typography>
+      </Box>
     </Box>
   );
 };

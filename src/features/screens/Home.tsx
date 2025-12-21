@@ -1,14 +1,12 @@
 import {
   Alert,
   AlertColor,
-  AlertProps,
   AlertPropsColorOverrides,
   Button,
   Dialog,
   DialogContent,
   DialogContentText,
   Grid,
-  Link,
 } from "@mui/material";
 import { OverridableStringUnion } from "@mui/types";
 import { useEffect, useState } from "react";
@@ -16,8 +14,8 @@ import { useNavigate } from "react-router";
 import Cookies from "universal-cookie";
 import { useAuthEndpoint } from "../api/utils";
 import { LoadingButton } from "@mui/lab";
-import { AxiosResponse } from "axios";
 import { MovieSearch } from "../search/MovieSearch";
+import { useAuth } from "../context/AuthContext";
 
 const LoginFeedback = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   let severity:
@@ -38,11 +36,13 @@ export const Home = () => {
   const [tokenState, setTokenState] = useState(token);
   const { result, status, err, callAuthEndpoint } = useAuthEndpoint();
   const [messageToDisplay, setMessageToDisplay] = useState<String | null>(null);
+  const { setUser } = useAuth();
 
   const navigate = useNavigate();
 
   const logout = async () => {
     cookies.remove("TOKEN", { path: "./" });
+    setUser(null);
     navigate("/");
   };
 
@@ -73,12 +73,6 @@ export const Home = () => {
       </Grid>
       <Grid size={12}>
         <MovieSearch />
-      </Grid>
-      <Grid>
-        <Link href="/register">Register</Link>
-      </Grid>
-      <Grid>
-        <Link href="/login">Login</Link>
       </Grid>
       <Grid size={12}>
         <Button variant="contained" onClick={() => logout()}>
