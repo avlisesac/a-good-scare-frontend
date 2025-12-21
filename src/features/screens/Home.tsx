@@ -2,7 +2,6 @@ import {
   Alert,
   AlertColor,
   AlertPropsColorOverrides,
-  Button,
   Dialog,
   DialogContent,
   DialogContentText,
@@ -10,12 +9,10 @@ import {
 } from "@mui/material";
 import { OverridableStringUnion } from "@mui/types";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import Cookies from "universal-cookie";
 import { useAuthEndpoint } from "../api/utils";
 import { LoadingButton } from "@mui/lab";
 import { MovieSearch } from "../search/MovieSearch";
-import { useAuth } from "../context/AuthContext";
 
 const LoginFeedback = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   let severity:
@@ -36,15 +33,6 @@ export const Home = () => {
   const [tokenState, setTokenState] = useState(token);
   const { result, status, err, callAuthEndpoint } = useAuthEndpoint();
   const [messageToDisplay, setMessageToDisplay] = useState<String | null>(null);
-  const { setUser } = useAuth();
-
-  const navigate = useNavigate();
-
-  const logout = async () => {
-    cookies.remove("TOKEN", { path: "./" });
-    setUser(null);
-    navigate("/");
-  };
 
   const handleAuthCall = async (token: String) => {
     let newMessageToDisplay: String | null = null;
@@ -73,11 +61,6 @@ export const Home = () => {
       </Grid>
       <Grid size={12}>
         <MovieSearch />
-      </Grid>
-      <Grid size={12}>
-        <Button variant="contained" onClick={() => logout()}>
-          Logout
-        </Button>
       </Grid>
       <Grid size={12}>
         <LoadingButton

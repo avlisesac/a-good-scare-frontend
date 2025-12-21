@@ -31,8 +31,6 @@ export const Login = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
   // TODO:
-  // - add avatar w/ letter in appbar
-  // - make the avatar a button to open a dropdown w/ a logout button
   // - Investigate httponly cookies
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -1,17 +1,40 @@
 import {
   AppBar,
+  Avatar,
   Box,
   Button,
   Container,
+  IconButton,
+  Menu,
+  MenuItem,
   Toolbar,
   Typography,
 } from "@mui/material";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Cookies from "universal-cookie";
 
 export const AGSAppBar = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, setUser } = useAuth();
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+
+  const navigate = useNavigate();
+  const cookies = new Cookies();
+
+  const logout = async () => {
+    cookies.remove("TOKEN", { path: "./" });
+    setUser(null);
+    navigate("/");
+  };
+
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
 
   useEffect(() => {
     console.log("user:", user);
@@ -36,7 +59,38 @@ export const AGSAppBar = () => {
             A Good Scare
           </Typography>
           {!user && <Button href="/login">Login</Button>}
-          {user && <Typography>{user.email[0]}</Typography>}
+          {user && (
+            <>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <Avatar alt={user.email}>{user.email[0]}</Avatar>
+              </IconButton>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                <MenuItem
+                  onClick={() => {
+                    logout();
+                    handleCloseUserMenu();
+                  }}
+                >
+                  <Typography sx={{ textAlign: "center" }}>Logout</Typography>
+                </MenuItem>
+              </Menu>
+            </>
+          )}
         </Toolbar>
       </AppBar>
       <Container sx={{ marginTop: 2 }}>
