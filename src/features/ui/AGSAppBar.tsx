@@ -13,20 +13,13 @@ import {
 import { Outlet, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
-import Cookies from "universal-cookie";
+import { useLogout } from "../api/utils";
 
 export const AGSAppBar = () => {
-  const { user, loading, setUser } = useAuth();
+  const { user, loading } = useAuth();
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-
+  const { logout } = useLogout();
   const navigate = useNavigate();
-  const cookies = new Cookies();
-
-  const logout = async () => {
-    cookies.remove("TOKEN", { path: "./" });
-    setUser(null);
-    navigate("/");
-  };
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -58,6 +51,13 @@ export const AGSAppBar = () => {
           >
             A Good Scare
           </Typography>
+          <Button
+            onClick={() => {
+              navigate("/test");
+            }}
+          >
+            Test Page
+          </Button>
           {!user && <Button href="/login">Login</Button>}
           {user && (
             <>
@@ -82,7 +82,7 @@ export const AGSAppBar = () => {
               >
                 <MenuItem
                   onClick={() => {
-                    logout();
+                    logout("/");
                     handleCloseUserMenu();
                   }}
                 >
