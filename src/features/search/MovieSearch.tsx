@@ -1,6 +1,7 @@
 import {
   Autocomplete,
   Box,
+  Dialog,
   ListItem,
   ListItemText,
   TextField,
@@ -8,9 +9,15 @@ import {
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { useGetTmdbConfig, useSearchMovies } from "../api/utils";
+import { MovieResultItem } from "@lorenzopant/tmdb";
+import { MovieDetails } from "../movies/MovieDetails";
 
 export const MovieSearch = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedMovie, setSelectedMovie] = useState<MovieResultItem | null>(
+    null
+  );
+
   const {
     result: searchResult,
     status: searchStatus,
@@ -48,7 +55,7 @@ export const MovieSearch = () => {
         onInputChange={(event, newValue) => {
           setSearchTerm(newValue);
         }}
-        disabled={configStatus !== "success"}
+        disabled={configStatus !== "success" || !!selectedMovie}
         loading={searchStatus === "loading"}
         options={searchResult || []}
         filterOptions={(x) => x}
@@ -57,7 +64,14 @@ export const MovieSearch = () => {
         getOptionLabel={(movie) => movie.title}
         renderInput={(params) => <TextField {...params} label="Movie" />}
         renderOption={({ key, ...props }, option) => (
-          <ListItem key={option.id} {...props} sx={{ gap: 2 }}>
+          <ListItem
+            key={option.id}
+            {...props}
+            sx={{ gap: 2 }}
+            onClick={() => {
+              setSelectedMovie(option);
+            }}
+          >
             <Box
               component="img"
               sx={{ width: 92 }}
@@ -73,6 +87,11 @@ export const MovieSearch = () => {
           </ListItem>
         )}
       />
+      <Dialog onClose={() => setSelectedMovie(null)} open={!!selectedMovie}>
+        {selectedMovie && tmdbConfig && (
+          <MovieDetails movie={selectedMovie} tmdbConfig={tmdbConfig} />
+        )}
+      </Dialog>
     </>
   );
 };
