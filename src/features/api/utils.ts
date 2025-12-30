@@ -1,9 +1,10 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useAsyncAction } from "./useAsyncAction";
 import { MovieResultItem, TMDB, TMDBError } from "@lorenzopant/tmdb";
 import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuration";
+import Cookies from "universal-cookie";
+import { useAuth } from "../context/AuthContext";
 
 type RegistrationInput = {
   email: string;
@@ -24,6 +25,20 @@ const api = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
 });
+
+export const useLogout = () => {
+  const cookies = new Cookies();
+  const { user, loading, setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const logout = (destination: string) => {
+    cookies.remove("TOKEN", { path: "./" });
+    setUser(null);
+    navigate(destination);
+  };
+
+  return { logout };
+};
 
 const tmdb = new TMDB(process.env.REACT_APP_TMDB_ACCESS_TOKEN ?? "");
 
