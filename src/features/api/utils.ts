@@ -16,6 +16,37 @@ type LoginInput = {
   password: string;
 };
 
+type DBDateFields = {
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+};
+
+export type MovieRatingOptions = "pos" | "neg" | null;
+
+export type MovieToUser = DBDateFields & {
+  movieId: number;
+  userId: string;
+  wantToWatch?: boolean;
+  seen?: boolean;
+  rating?: MovieRatingOptions;
+  review?: string;
+  reviewContainsSpoiler?: boolean;
+  flaggedAsNotHorror?: boolean;
+};
+
+export type GetMovieToUserInput = {
+  movieId: number;
+  userId: string;
+  token: string;
+};
+
+export type RateMovieInput = {
+  movieId: number;
+  rating?: MovieRatingOptions;
+  token: string;
+};
+
 type RegistrationResponse = {};
 type LoginResponse = {};
 
@@ -92,6 +123,43 @@ export const getTmdbConfig = async (): Promise<ConfigurationResponse> => {
   return config;
 };
 
+export const getMovieToUser = async ({
+  movieId,
+  userId,
+  token,
+}: GetMovieToUserInput): Promise<MovieToUser> => {
+  const configuration: AxiosRequestConfig = {
+    method: "get",
+    url: `/api/rate/${movieId}/${userId}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const response = await api(configuration);
+  return response.data;
+};
+
+export const rateMovie = async ({
+  movieId,
+  token,
+  rating,
+}: RateMovieInput): Promise<MovieToUser> => {
+  const configuration: AxiosRequestConfig = {
+    method: "post",
+    url: `/api/rate/${movieId}`,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    data: {
+      rating: rating,
+    },
+  };
+
+  const response = await api(configuration);
+  return response.data;
+};
+
 export const useLogin = () => {
   const { execute, ...state } = useAsyncAction<LoginInput, AxiosResponse>(
     login
@@ -126,4 +194,19 @@ export const useGetTmdbConfig = () => {
     getTmdbConfig
   );
   return { ...state, attemptConfig: execute };
+};
+
+export const useGetMovieToUser = () => {
+  const { execute, ...state } = useAsyncAction<
+    GetMovieToUserInput,
+    MovieToUser
+  >(getMovieToUser);
+  return { ...state, attemptGet: execute };
+};
+
+export const useRateMovie = () => {
+  const { execute, ...state } = useAsyncAction<RateMovieInput, MovieToUser>(
+    rateMovie
+  );
+  return { ...state, attemptRate: execute };
 };
