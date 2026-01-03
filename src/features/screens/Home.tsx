@@ -8,11 +8,11 @@ import {
   Grid,
 } from "@mui/material";
 import { OverridableStringUnion } from "@mui/types";
-import { useEffect, useState } from "react";
-import Cookies from "universal-cookie";
+import { useState } from "react";
 import { useAuthEndpoint } from "../api/utils";
 import { LoadingButton } from "@mui/lab";
 import { MovieSearch } from "../search/MovieSearch";
+import { useAuth } from "../context/AuthContext";
 
 const LoginFeedback = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   let severity:
@@ -27,17 +27,14 @@ const LoginFeedback = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
 };
 
 export const Home = () => {
-  const cookies = new Cookies();
-  const token = cookies.get("TOKEN");
-  console.log("token:", token);
-  const [tokenState, setTokenState] = useState(token);
+  const { user, loading } = useAuth();
   const { result, status, err, callAuthEndpoint } = useAuthEndpoint();
   const [messageToDisplay, setMessageToDisplay] = useState<String | null>(null);
 
-  const handleAuthCall = async (token: String) => {
+  const handleAuthCall = async () => {
     let newMessageToDisplay: String | null = null;
     try {
-      const result = await callAuthEndpoint(token);
+      const result = await callAuthEndpoint();
       console.log("result:", result);
       newMessageToDisplay = result;
     } catch (errLocal) {
@@ -47,17 +44,13 @@ export const Home = () => {
     setMessageToDisplay(newMessageToDisplay);
   };
 
-  useEffect(() => {
-    setTokenState(token);
-  }, [token]);
-
   return (
     <Grid container spacing={2}>
       <Grid size={12}>
         <h1>Home</h1>
       </Grid>
       <Grid size={12}>
-        <LoginFeedback isLoggedIn={!!token} />
+        <LoginFeedback isLoggedIn={!!user} />
       </Grid>
       <Grid size={12}>
         <MovieSearch />
@@ -66,7 +59,7 @@ export const Home = () => {
         <LoadingButton
           variant="outlined"
           onClick={() => {
-            handleAuthCall(token);
+            handleAuthCall();
           }}
           loading={status === "loading"}
           disabled={status === "loading"}

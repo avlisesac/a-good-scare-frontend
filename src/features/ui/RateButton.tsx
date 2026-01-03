@@ -8,7 +8,6 @@ import {
   useGetMovieToUser,
   useRateMovie,
 } from "../api/utils";
-import Cookies from "universal-cookie";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
@@ -19,9 +18,6 @@ export const RateButton = ({ movieId }: { movieId: number }) => {
   const { user, loading: loadingUser } = useAuth();
   const [ratingToUse, setRatingToUse] = useState<MovieToUser | null>(null);
 
-  const cookies = new Cookies();
-  const token = cookies.get("TOKEN");
-
   const handleRateClick = async (rating: MovieRatingOptions) => {
     let finalRating: MovieRatingOptions = rating;
     const currentRating = ratingToUse?.rating;
@@ -31,7 +27,6 @@ export const RateButton = ({ movieId }: { movieId: number }) => {
     try {
       const ratingInput: RateMovieInput = {
         movieId: movieId,
-        token: token,
         rating: finalRating,
       };
       const result = await attemptRate(ratingInput);
@@ -47,7 +42,6 @@ export const RateButton = ({ movieId }: { movieId: number }) => {
       const result = await attemptGet({
         userId: userId,
         movieId,
-        token,
       });
       setRatingToUse(result);
     } catch (err) {

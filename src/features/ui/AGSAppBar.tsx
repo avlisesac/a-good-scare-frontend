@@ -13,12 +13,10 @@ import {
 import { Outlet, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
-import { useLogout } from "../api/utils";
 
 export const AGSAppBar = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-  const { logout } = useLogout();
   const navigate = useNavigate();
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -82,8 +80,9 @@ export const AGSAppBar = () => {
               >
                 <MenuItem
                   onClick={() => {
-                    logout("/");
+                    logout();
                     handleCloseUserMenu();
+                    navigate("/");
                   }}
                 >
                   <Typography sx={{ textAlign: "center" }}>Logout</Typography>
