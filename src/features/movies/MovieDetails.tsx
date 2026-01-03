@@ -2,6 +2,7 @@ import { MovieResultItem } from "@lorenzopant/tmdb";
 import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuration";
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { format } from "date-fns";
+import { RateButton } from "../ui/RateButton";
 
 export type MovieDetailsProps = {
   movie: MovieResultItem;
@@ -25,6 +26,7 @@ export const MovieDetails = ({ movie, tmdbConfig }: MovieDetailsProps) => {
             {format(movie.release_date, "y")}
           </Typography>
         )}
+        <RateButton movieId={movie.id} />
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {movie.overview}
         </Typography>
