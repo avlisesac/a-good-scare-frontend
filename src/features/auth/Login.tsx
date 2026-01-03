@@ -2,7 +2,6 @@ import { Alert, Box, TextField, Typography } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { ChangeEvent, useState } from "react";
 import { useLogin } from "../api/utils";
-import Cookies from "universal-cookie";
 import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
@@ -10,8 +9,6 @@ type LoginFormData = {
   email: string;
   password: string;
 };
-
-const cookies = new Cookies();
 
 export const Login = () => {
   const [formData, setFormData] = useState<LoginFormData>({
@@ -41,14 +38,11 @@ export const Login = () => {
         email: formData.email,
         password: formData.password,
       });
-      if (result.data?.token) {
-        cookies.set("TOKEN", result.data.token, { path: "/" });
-        navigate("/");
-      }
       const user = result.data?.user;
-      console.log("user (Login):", user);
       if (user) {
+        console.log("user (Login):", user);
         setUser(user);
+        navigate("/");
       }
     } catch (err) {
       console.error(err);

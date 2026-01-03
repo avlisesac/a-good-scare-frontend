@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import { useAsyncAction } from "./useAsyncAction";
 import { MovieResultItem, TMDB, TMDBError } from "@lorenzopant/tmdb";
 import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuration";
-import Cookies from "universal-cookie";
 import { useAuth } from "../context/AuthContext";
 
 type RegistrationInput = {
@@ -38,13 +37,11 @@ export type MovieToUser = DBDateFields & {
 export type GetMovieToUserInput = {
   movieId: number;
   userId: string;
-  token: string;
 };
 
 export type RateMovieInput = {
   movieId: number;
   rating?: MovieRatingOptions;
-  token: string;
 };
 
 type RegistrationResponse = {};
@@ -58,12 +55,10 @@ const api = axios.create({
 });
 
 export const useLogout = () => {
-  const cookies = new Cookies();
   const { user, loading, setUser } = useAuth();
   const navigate = useNavigate();
 
   const logout = (destination: string) => {
-    cookies.remove("TOKEN", { path: "./" });
     setUser(null);
     navigate(destination);
   };
@@ -90,7 +85,7 @@ export const register = async (
 export const login = async (input: LoginInput): Promise<AxiosResponse> => {
   const configuration: AxiosRequestConfig = {
     method: "post",
-    url: "/api/login",
+    url: "/api/auth/login",
     data: {
       ...input,
     },
@@ -99,13 +94,10 @@ export const login = async (input: LoginInput): Promise<AxiosResponse> => {
   return response;
 };
 
-export const callAuthEndpoint = async (input: String): Promise<String> => {
+export const callAuthEndpoint = async (): Promise<String> => {
   const configuration: AxiosRequestConfig = {
     method: "get",
     url: "/api/auth-endpoint",
-    headers: {
-      Authorization: `Bearer ${input}`,
-    },
   };
   const response = await api(configuration);
   return response.data.message;
@@ -126,14 +118,10 @@ export const getTmdbConfig = async (): Promise<ConfigurationResponse> => {
 export const getMovieToUser = async ({
   movieId,
   userId,
-  token,
 }: GetMovieToUserInput): Promise<MovieToUser> => {
   const configuration: AxiosRequestConfig = {
     method: "get",
     url: `/api/rate/${movieId}/${userId}`,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
   };
 
   const response = await api(configuration);
@@ -142,15 +130,11 @@ export const getMovieToUser = async ({
 
 export const rateMovie = async ({
   movieId,
-  token,
   rating,
 }: RateMovieInput): Promise<MovieToUser> => {
   const configuration: AxiosRequestConfig = {
     method: "post",
     url: `/api/rate/${movieId}`,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
     data: {
       rating: rating,
     },
@@ -176,9 +160,7 @@ export const useRegister = () => {
 };
 
 export const useAuthEndpoint = () => {
-  const { execute, ...state } = useAsyncAction<String, String>(
-    callAuthEndpoint
-  );
+  const { execute, ...state } = useAsyncAction<void, String>(callAuthEndpoint);
   return { ...state, callAuthEndpoint: execute };
 };
 
