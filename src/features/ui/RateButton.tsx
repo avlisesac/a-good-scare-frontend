@@ -3,20 +3,20 @@ import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import {
   MovieRatingOptions,
-  MovieToUser,
+  Rating,
   RateMovieInput,
-  useGetMovieToUser,
   useRateMovie,
+  useGetRating,
 } from "../api/utils";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 export const RateButton = ({ movieId }: { movieId: number }) => {
   const { attemptRate, status } = useRateMovie();
-  const { attemptGet, status: initialFetchStatus } = useGetMovieToUser();
+  const { attemptGet, status: initialFetchStatus } = useGetRating();
   const buttonDisablingStatuses = [status, initialFetchStatus];
   const { user, loading: loadingUser } = useAuth();
-  const [ratingToUse, setRatingToUse] = useState<MovieToUser | null>(null);
+  const [ratingToUse, setRatingToUse] = useState<Rating | null>(null);
 
   const handleRateClick = async (rating: MovieRatingOptions) => {
     let finalRating: MovieRatingOptions = rating;
