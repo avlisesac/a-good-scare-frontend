@@ -23,18 +23,13 @@ type DBDateFields = {
 
 export type MovieRatingOptions = "pos" | "neg" | null;
 
-export type MovieToUser = DBDateFields & {
+export type Rating = DBDateFields & {
   movieId: number;
   userId: string;
-  wantToWatch?: boolean;
-  seen?: boolean;
   rating?: MovieRatingOptions;
-  review?: string;
-  reviewContainsSpoiler?: boolean;
-  flaggedAsNotHorror?: boolean;
 };
 
-export type GetMovieToUserInput = {
+export type GetRatingInput = {
   movieId: number;
   userId: string;
 };
@@ -115,13 +110,13 @@ export const getTmdbConfig = async (): Promise<ConfigurationResponse> => {
   return config;
 };
 
-export const getMovieToUser = async ({
+export const getRating = async ({
   movieId,
   userId,
-}: GetMovieToUserInput): Promise<MovieToUser> => {
+}: GetRatingInput): Promise<Rating> => {
   const configuration: AxiosRequestConfig = {
     method: "get",
-    url: `/api/rate/${movieId}/${userId}`,
+    url: `/api/rating/${movieId}/${userId}`,
   };
 
   const response = await api(configuration);
@@ -131,10 +126,10 @@ export const getMovieToUser = async ({
 export const rateMovie = async ({
   movieId,
   rating,
-}: RateMovieInput): Promise<MovieToUser> => {
+}: RateMovieInput): Promise<Rating> => {
   const configuration: AxiosRequestConfig = {
     method: "post",
-    url: `/api/rate/${movieId}`,
+    url: `/api/rating/${movieId}`,
     data: {
       rating: rating,
     },
@@ -178,16 +173,15 @@ export const useGetTmdbConfig = () => {
   return { ...state, attemptConfig: execute };
 };
 
-export const useGetMovieToUser = () => {
-  const { execute, ...state } = useAsyncAction<
-    GetMovieToUserInput,
-    MovieToUser
-  >(getMovieToUser);
+export const useGetRating = () => {
+  const { execute, ...state } = useAsyncAction<GetRatingInput, Rating>(
+    getRating
+  );
   return { ...state, attemptGet: execute };
 };
 
 export const useRateMovie = () => {
-  const { execute, ...state } = useAsyncAction<RateMovieInput, MovieToUser>(
+  const { execute, ...state } = useAsyncAction<RateMovieInput, Rating>(
     rateMovie
   );
   return { ...state, attemptRate: execute };
