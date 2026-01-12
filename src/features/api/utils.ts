@@ -23,15 +23,24 @@ type DBDateFields = {
 
 export type MovieRatingOptions = "pos" | "neg" | null;
 
-export type Rating = DBDateFields & {
+export type UserRating = DBDateFields & {
   movieId: number;
   userId: string;
   rating?: MovieRatingOptions;
 };
 
-export type GetRatingInput = {
+export type MovieRating = DBDateFields & {
+  movieId: number;
+  average: string;
+};
+
+export type GetUserRatingInput = {
   movieId: number;
   userId: string;
+};
+
+export type GetMovieRatingInput = {
+  movieId: number;
 };
 
 export type RateMovieInput = {
@@ -110,10 +119,10 @@ export const getTmdbConfig = async (): Promise<ConfigurationResponse> => {
   return config;
 };
 
-export const getRating = async ({
+export const getUserRating = async ({
   movieId,
   userId,
-}: GetRatingInput): Promise<Rating> => {
+}: GetUserRatingInput): Promise<UserRating> => {
   const configuration: AxiosRequestConfig = {
     method: "get",
     url: `/api/rating/${movieId}/${userId}`,
@@ -123,10 +132,22 @@ export const getRating = async ({
   return response.data;
 };
 
+export const getMovieRating = async ({
+  movieId,
+}: GetMovieRatingInput): Promise<MovieRating> => {
+  const configuration: AxiosRequestConfig = {
+    method: "get",
+    url: `/api/rating/${movieId}`,
+  };
+
+  const response = await api(configuration);
+  return response.data;
+};
+
 export const rateMovie = async ({
   movieId,
   rating,
-}: RateMovieInput): Promise<Rating> => {
+}: RateMovieInput): Promise<UserRating> => {
   const configuration: AxiosRequestConfig = {
     method: "post",
     url: `/api/rating/${movieId}`,
@@ -173,16 +194,24 @@ export const useGetTmdbConfig = () => {
   return { ...state, attemptConfig: execute };
 };
 
-export const useGetRating = () => {
-  const { execute, ...state } = useAsyncAction<GetRatingInput, Rating>(
-    getRating
+export const useGetUserRating = () => {
+  const { execute, ...state } = useAsyncAction<GetUserRatingInput, UserRating>(
+    getUserRating
   );
   return { ...state, attemptGet: execute };
 };
 
 export const useRateMovie = () => {
-  const { execute, ...state } = useAsyncAction<RateMovieInput, Rating>(
+  const { execute, ...state } = useAsyncAction<RateMovieInput, UserRating>(
     rateMovie
   );
   return { ...state, attemptRate: execute };
+};
+
+export const useGetMovieRating = () => {
+  const { execute, ...state } = useAsyncAction<
+    GetMovieRatingInput,
+    MovieRating
+  >(getMovieRating);
+  return { ...state, attemptGet: execute };
 };

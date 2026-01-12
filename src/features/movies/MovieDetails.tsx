@@ -3,6 +3,9 @@ import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuratio
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { RateButton } from "../ui/RateButton";
+import { useGetMovieRating } from "../api/utils";
+import { useEffect } from "react";
+import { OverallRating } from "../ui/OverallRating";
 
 export type MovieDetailsProps = {
   movie: MovieResultItem;
@@ -10,6 +13,18 @@ export type MovieDetailsProps = {
 };
 
 export const MovieDetails = ({ movie, tmdbConfig }: MovieDetailsProps) => {
+  const { result, status, attemptGet } = useGetMovieRating();
+
+  useEffect(() => {
+    console.log("result:", result);
+  }, [result]);
+
+  useEffect(() => {
+    attemptGet({
+      movieId: movie.id,
+    });
+  }, []);
+
   return (
     <Card sx={{ maxWidth: 500, maxHeight: "80%", overflow: "scroll", p: 2 }}>
       <CardMedia
@@ -26,7 +41,11 @@ export const MovieDetails = ({ movie, tmdbConfig }: MovieDetailsProps) => {
             {format(movie.release_date, "y")}
           </Typography>
         )}
-        <RateButton movieId={movie.id} />
+        <OverallRating
+          rating={result?.average}
+          loading={status === "loading"}
+        />
+        <RateButton movieId={movie.id} refetchAverage={attemptGet} />
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {movie.overview}
         </Typography>

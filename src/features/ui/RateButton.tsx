@@ -3,20 +3,27 @@ import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import {
   MovieRatingOptions,
-  Rating,
+  UserRating,
   RateMovieInput,
   useRateMovie,
-  useGetRating,
+  useGetUserRating,
+  MovieRating,
+  GetMovieRatingInput,
 } from "../api/utils";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
-export const RateButton = ({ movieId }: { movieId: number }) => {
+type RateButtonProps = {
+  movieId: number;
+  refetchAverage: (input: GetMovieRatingInput) => Promise<MovieRating>;
+};
+
+export const RateButton = ({ movieId, refetchAverage }: RateButtonProps) => {
   const { attemptRate, status } = useRateMovie();
-  const { attemptGet, status: initialFetchStatus } = useGetRating();
+  const { attemptGet, status: initialFetchStatus } = useGetUserRating();
   const buttonDisablingStatuses = [status, initialFetchStatus];
   const { user, loading: loadingUser } = useAuth();
-  const [ratingToUse, setRatingToUse] = useState<Rating | null>(null);
+  const [ratingToUse, setRatingToUse] = useState<UserRating | null>(null);
 
   const handleRateClick = async (rating: MovieRatingOptions) => {
     let finalRating: MovieRatingOptions = rating;
@@ -32,6 +39,7 @@ export const RateButton = ({ movieId }: { movieId: number }) => {
       const result = await attemptRate(ratingInput);
       console.log("result:", result);
       setRatingToUse(result);
+      refetchAverage({ movieId });
     } catch (err) {
       console.error("rating error:", err);
     }
