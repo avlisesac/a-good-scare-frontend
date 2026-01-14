@@ -1,11 +1,19 @@
 import { MovieResultItem } from "@lorenzopant/tmdb";
 import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuration";
-import { Card, CardContent, CardMedia, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import { format } from "date-fns";
 import { RateButton } from "../ui/RateButton";
 import { useGetMovieRating } from "../api/utils";
 import { useEffect } from "react";
 import { OverallRating } from "../ui/OverallRating";
+import { WatchlistButton } from "../ui/WatchlistButton";
 
 export type MovieDetailsProps = {
   movie: MovieResultItem;
@@ -27,6 +35,7 @@ export const MovieDetails = ({ movie, tmdbConfig }: MovieDetailsProps) => {
 
   return (
     <Card sx={{ maxWidth: 500, maxHeight: "80%", overflow: "scroll", p: 2 }}>
+      <WatchlistButton movieId={movie.id} />
       <CardMedia
         component="img"
         sx={{ width: 154 }}
