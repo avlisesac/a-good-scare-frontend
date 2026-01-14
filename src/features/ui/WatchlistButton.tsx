@@ -1,11 +1,9 @@
-import { Button } from "@mui/material";
 import BookmarkAddIcon from "@mui/icons-material/BookmarkAdd";
 import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
 import {
   UpdateWatchlistEntryInput,
   useUpdateWatchlistEntry,
   useGetWatchlistEntry,
-  WatchlistEntry,
   WatchlistEntryAction,
 } from "../api/utils";
 import { useEffect, useState } from "react";
@@ -16,10 +14,6 @@ export type WatchlistButtonProps = {
 };
 
 export const WatchlistButton = ({ movieId }: WatchlistButtonProps) => {
-  // TODO: Add an initial fetch to see if the movie is already in the user's watchlist.
-  // TODO: Make the button text/icon dynamic based on whether the movie is in the user's watchlist.
-  // TODO: Make the button behavior dynamic, adding or removing the movie from the user's watchlist based on curent status.
-
   const { status: initialFetchStatus, attemptGet } = useGetWatchlistEntry();
   const { status: addToWatchlistStatus, attemptUpdate } =
     useUpdateWatchlistEntry();
