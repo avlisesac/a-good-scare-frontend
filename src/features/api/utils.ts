@@ -22,11 +22,26 @@ type DBDateFields = {
 };
 
 export type MovieRatingOptions = "pos" | "neg" | null;
+export type WatchlistEntryAction = "add" | "remove";
 
 export type UserRating = DBDateFields & {
   movieId: number;
   userId: string;
   rating?: MovieRatingOptions;
+};
+
+export type UpdateWatchlistEntryInput = {
+  movieId: number;
+  action: WatchlistEntryAction;
+};
+
+export type GetWatchlistEntryInput = {
+  movieId: number;
+};
+
+export type WatchlistEntry = DBDateFields & {
+  movieId: number;
+  toWatch?: boolean;
 };
 
 export type MovieRating = DBDateFields & {
@@ -132,6 +147,18 @@ export const getUserRating = async ({
   return response.data;
 };
 
+export const getWatchlistEntry = async ({
+  movieId,
+}: GetWatchlistEntryInput): Promise<WatchlistEntry> => {
+  const configuration: AxiosRequestConfig = {
+    method: "get",
+    url: `/api/watchlist/${movieId}`,
+  };
+
+  const response = await api(configuration);
+  return response.data;
+};
+
 export const getMovieRating = async ({
   movieId,
 }: GetMovieRatingInput): Promise<MovieRating> => {
@@ -154,6 +181,19 @@ export const rateMovie = async ({
     data: {
       rating: rating,
     },
+  };
+
+  const response = await api(configuration);
+  return response.data;
+};
+
+export const updateWatchlistEntry = async ({
+  movieId,
+  action,
+}: UpdateWatchlistEntryInput): Promise<WatchlistEntry> => {
+  const configuration: AxiosRequestConfig = {
+    method: "post",
+    url: `/api/watchlist/${movieId}/${action}`,
   };
 
   const response = await api(configuration);
@@ -213,5 +253,21 @@ export const useGetMovieRating = () => {
     GetMovieRatingInput,
     MovieRating
   >(getMovieRating);
+  return { ...state, attemptGet: execute };
+};
+
+export const useUpdateWatchlistEntry = () => {
+  const { execute, ...state } = useAsyncAction<
+    UpdateWatchlistEntryInput,
+    WatchlistEntry
+  >(updateWatchlistEntry);
+  return { ...state, attemptUpdate: execute };
+};
+
+export const useGetWatchlistEntry = () => {
+  const { execute, ...state } = useAsyncAction<
+    GetWatchlistEntryInput,
+    WatchlistEntry
+  >(getWatchlistEntry);
   return { ...state, attemptGet: execute };
 };
