@@ -27,8 +27,7 @@ export const Login = () => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  // TODO:
-  // - Investigate httponly cookies
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("submitting login form w/:", formData);

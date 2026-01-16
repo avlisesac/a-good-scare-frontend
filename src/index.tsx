@@ -9,7 +9,8 @@ import { Login } from "./features/auth/Login";
 import { Protected } from "./features/screens/Protected";
 import { AGSAppBar } from "./features/ui/AGSAppBar";
 import { AuthProvider } from "./features/context/AuthContext";
-import { TestScreen } from "./features/screens/TestScreen";
+import { Watchlist } from "./features/screens/Watchlist";
+import { TMDBConfigProvider } from "./features/context/TMDBConfigContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -17,17 +18,19 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AGSAppBar />}>
-            <Route index element={<Home />} />
-            <Route path="register" element={<Register />} />
-            <Route path="login" element={<Login />} />
-            <Route path="test" element={<TestScreen />} />
-            <Route path="protected" element={<Protected />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <TMDBConfigProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AGSAppBar />}>
+              <Route index element={<Home />} />
+              <Route path="register" element={<Register />} />
+              <Route path="login" element={<Login />} />
+              <Route path="protected" element={<Protected />} />
+              <Route path="watchlist" element={<Watchlist />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </TMDBConfigProvider>
     </AuthProvider>
   </React.StrictMode>
 );
