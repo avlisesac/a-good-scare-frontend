@@ -4,7 +4,7 @@ import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { RateButton } from "../ui/RateButton";
 import { useGetMovieRating } from "../api/utils";
-import { useEffect } from "react";
+import { SetStateAction, useEffect } from "react";
 import { OverallRating } from "../ui/OverallRating";
 import { WatchlistButton } from "../ui/WatchlistButton";
 

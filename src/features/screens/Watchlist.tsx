@@ -17,6 +17,7 @@ export const Watchlist = () => {
       const result = await attemptGet();
       if (result) {
         setWatchlist(result);
+        setSelectedMovie(null);
       }
     } catch (err) {
       console.error("error with initial watchlist fetch:", err);
