@@ -1,26 +1,24 @@
-import { MovieResultItem } from "@lorenzopant/tmdb";
+import { MovieDetails, MovieResultItem } from "@lorenzopant/tmdb";
 import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuration";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardMedia,
-  IconButton,
-  Typography,
-} from "@mui/material";
+import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { RateButton } from "../ui/RateButton";
 import { useGetMovieRating } from "../api/utils";
-import { useEffect } from "react";
+import { SetStateAction, useEffect } from "react";
 import { OverallRating } from "../ui/OverallRating";
 import { WatchlistButton } from "../ui/WatchlistButton";
 
 export type MovieDetailsProps = {
-  movie: MovieResultItem;
+  movie: MovieResultItem | MovieDetails;
   tmdbConfig: ConfigurationResponse;
+  fetchAndSetWatchlist?: () => Promise<void>;
 };
 
-export const MovieDetails = ({ movie, tmdbConfig }: MovieDetailsProps) => {
+export const MovieDetailsScreen = ({
+  movie,
+  tmdbConfig,
+  fetchAndSetWatchlist,
+}: MovieDetailsProps) => {
   const { result, status, attemptGet } = useGetMovieRating();
 
   useEffect(() => {
@@ -35,7 +33,10 @@ export const MovieDetails = ({ movie, tmdbConfig }: MovieDetailsProps) => {
 
   return (
     <Card sx={{ maxWidth: 500, maxHeight: "80%", overflow: "scroll", p: 2 }}>
-      <WatchlistButton movieId={movie.id} />
+      <WatchlistButton
+        movieId={movie.id}
+        postUpdateAction={fetchAndSetWatchlist}
+      />
       <CardMedia
         component="img"
         sx={{ width: 154 }}

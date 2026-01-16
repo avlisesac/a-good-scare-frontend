@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { useGetTmdbConfig, useSearchMovies } from "../api/utils";
 import { MovieResultItem } from "@lorenzopant/tmdb";
-import { MovieDetails } from "../movies/MovieDetails";
+import { MovieDetailsScreen } from "../movies/MovieDetailsScreen";
 
 export const MovieSearch = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -89,7 +89,7 @@ export const MovieSearch = () => {
       />
       <Dialog onClose={() => setSelectedMovie(null)} open={!!selectedMovie}>
         {selectedMovie && tmdbConfig && (
-          <MovieDetails movie={selectedMovie} tmdbConfig={tmdbConfig} />
+          <MovieDetailsScreen movie={selectedMovie} tmdbConfig={tmdbConfig} />
         )}
       </Dialog>
     </>

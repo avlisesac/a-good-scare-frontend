@@ -11,9 +11,13 @@ import { LoadingButton } from "@mui/lab";
 
 export type WatchlistButtonProps = {
   movieId: number;
+  postUpdateAction?: () => Promise<void>;
 };
 
-export const WatchlistButton = ({ movieId }: WatchlistButtonProps) => {
+export const WatchlistButton = ({
+  movieId,
+  postUpdateAction,
+}: WatchlistButtonProps) => {
   const { status: initialFetchStatus, attemptGet } = useGetWatchlistEntry();
   const { status: addToWatchlistStatus, attemptUpdate } =
     useUpdateWatchlistEntry();
@@ -54,6 +58,9 @@ export const WatchlistButton = ({ movieId }: WatchlistButtonProps) => {
         setWantToWatch(true);
       } else {
         setWantToWatch(false);
+      }
+      if (postUpdateAction) {
+        postUpdateAction();
       }
     } catch (err) {
       console.error("rating error:", err);

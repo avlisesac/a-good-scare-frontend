@@ -1,7 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { useNavigate } from "react-router";
 import { useAsyncAction } from "./useAsyncAction";
-import { MovieResultItem, TMDB, TMDBError } from "@lorenzopant/tmdb";
+import {
+  MovieDetails,
+  MovieResultItem,
+  TMDB,
+  TMDBError,
+} from "@lorenzopant/tmdb";
 import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuration";
 import { useAuth } from "../context/AuthContext";
 
@@ -129,6 +134,13 @@ export const searchMovies = async (
   return response.results;
 };
 
+export const getTmdbMovieDetails = async (
+  movieId: number
+): Promise<MovieDetails> => {
+  const response = await tmdb.movies.details({ movie_id: movieId });
+  return response;
+};
+
 export const getTmdbConfig = async (): Promise<ConfigurationResponse> => {
   const config = await tmdb.config.get();
   return config;
@@ -165,6 +177,16 @@ export const getMovieRating = async ({
   const configuration: AxiosRequestConfig = {
     method: "get",
     url: `/api/rating/${movieId}`,
+  };
+
+  const response = await api(configuration);
+  return response.data;
+};
+
+export const getFullWatchlist = async (): Promise<WatchlistEntry[]> => {
+  const configuration: AxiosRequestConfig = {
+    method: "get",
+    url: `/api/watchlist`,
   };
 
   const response = await api(configuration);
@@ -227,6 +249,13 @@ export const useSearchMovies = () => {
   return { ...state, attemptSearch: execute };
 };
 
+export const useGetTmdbDetails = () => {
+  const { execute, ...state } = useAsyncAction<number, MovieDetails>(
+    getTmdbMovieDetails
+  );
+  return { ...state, attemptGet: execute };
+};
+
 export const useGetTmdbConfig = () => {
   const { execute, ...state } = useAsyncAction<void, ConfigurationResponse>(
     getTmdbConfig
@@ -269,5 +298,12 @@ export const useGetWatchlistEntry = () => {
     GetWatchlistEntryInput,
     WatchlistEntry
   >(getWatchlistEntry);
+  return { ...state, attemptGet: execute };
+};
+
+export const useGetFullWatchlist = () => {
+  const { execute, ...state } = useAsyncAction<void, WatchlistEntry[]>(
+    getFullWatchlist
+  );
   return { ...state, attemptGet: execute };
 };

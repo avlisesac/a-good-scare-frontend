@@ -49,13 +49,6 @@ export const AGSAppBar = () => {
           >
             A Good Scare
           </Typography>
-          <Button
-            onClick={() => {
-              navigate("/test");
-            }}
-          >
-            Test Page
-          </Button>
           {!user && <Button href="/login">Login</Button>}
           {user && (
             <>
@@ -86,6 +79,16 @@ export const AGSAppBar = () => {
                   }}
                 >
                   <Typography sx={{ textAlign: "center" }}>Logout</Typography>
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleCloseUserMenu();
+                    navigate("/watchlist");
+                  }}
+                >
+                  <Typography sx={{ textAlign: "center" }}>
+                    My Watchlist
+                  </Typography>
                 </MenuItem>
               </Menu>
             </>
