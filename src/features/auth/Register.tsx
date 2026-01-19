@@ -1,20 +1,20 @@
 import { Alert, Box, Button, TextField } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { ChangeEvent, FormEventHandler, useState } from "react";
-import { useRegister } from "../api/utils";
+import { RegistrationInput, useRegister } from "../api/utils";
 import { useNavigate } from "react-router";
+import axios from "axios";
 
-type RegistrationFormData = {
-  email: string;
-  password: string;
-};
+const emailExistsError = "This email address is already in use.";
+const usernameExistsError = "This username is already in use.";
 
 export const Register = () => {
-  const [formData, setFormData] = useState<RegistrationFormData>({
+  const [formData, setFormData] = useState<RegistrationInput>({
     email: "",
+    username: "",
     password: "",
   });
-  const { status, err, result, attemptRegister } = useRegister();
+  const { status, attemptRegister } = useRegister();
   const [registerError, setRegisterError] = useState<String | null>(null);
   const navigate = useNavigate();
 
@@ -30,12 +30,27 @@ export const Register = () => {
     console.log("submitting registration form w/:", formData);
     try {
       const result = await attemptRegister({
-        email: formData.email,
+        email: formData.email.trim(),
+        username: formData.username.trim(),
         password: formData.password,
       });
+      console.log("registration result:", result);
       navigate("/login");
     } catch (err) {
-      setRegisterError(err as String);
+      console.error("registrationError:", err);
+      if (axios.isAxiosError(err)) {
+        const errData = err.response?.data;
+        const reason = errData?.reason;
+        if (reason === "emailExists") {
+          setRegisterError(emailExistsError);
+        } else if (reason === "usernameExists") {
+          setRegisterError(usernameExistsError);
+        } else {
+          setRegisterError(
+            errData.message || "Unknown error while registering."
+          );
+        }
+      }
     }
   };
 
@@ -50,10 +65,20 @@ export const Register = () => {
         width: "200px",
       }}
     >
+      <h1>Register</h1>
       <TextField
         label="Email"
         name="email"
         value={formData.email}
+        onChange={handleChange}
+        disabled={status === "loading"}
+        fullWidth
+        required
+      />
+      <TextField
+        label="Username"
+        name="username"
+        value={formData.username}
         onChange={handleChange}
         disabled={status === "loading"}
         fullWidth

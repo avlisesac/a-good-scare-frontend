@@ -1,21 +1,16 @@
 import { Alert, Box, TextField, Typography } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { ChangeEvent, useState } from "react";
-import { useLogin } from "../api/utils";
+import { extractAxiosErrorMessage, LoginInput, useLogin } from "../api/utils";
 import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
-type LoginFormData = {
-  email: string;
-  password: string;
-};
-
 export const Login = () => {
-  const [formData, setFormData] = useState<LoginFormData>({
-    email: "",
+  const [formData, setFormData] = useState<LoginInput>({
+    idField: "",
     password: "",
   });
-  const { status, err, result, attemptLogin } = useLogin();
+  const { status, attemptLogin } = useLogin();
   const [loginError, setLoginError] = useState<String | null>(null);
   const navigate = useNavigate();
   const { setUser } = useAuth();
@@ -34,7 +29,7 @@ export const Login = () => {
     setLoginError(null);
     try {
       const result = await attemptLogin({
-        email: formData.email,
+        idField: formData.idField,
         password: formData.password,
       });
       const user = result.data?.user;
@@ -45,7 +40,8 @@ export const Login = () => {
       }
     } catch (err) {
       console.error(err);
-      setLoginError(err as String);
+      const extractedMessage = extractAxiosErrorMessage(err);
+      setLoginError(extractedMessage || "Unknown error when logging in.");
     }
   };
 
@@ -61,9 +57,9 @@ export const Login = () => {
       }}
     >
       <TextField
-        label="Email"
-        name="email"
-        value={formData.email}
+        label="Username or Email"
+        name="idField"
+        value={formData.idField}
         onChange={handleChange}
         disabled={status === "loading"}
         fullWidth
