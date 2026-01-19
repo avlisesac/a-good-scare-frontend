@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { Outlet, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const AGSAppBar = () => {
   const { user, loading, logout } = useAuth();
@@ -49,7 +49,7 @@ export const AGSAppBar = () => {
           {user && (
             <>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt={user.email}>{user.username[0]}</Avatar>
+                <Avatar alt={user.email}>{user.username?.[0]}</Avatar>
               </IconButton>
               <Menu
                 sx={{ mt: "45px" }}
