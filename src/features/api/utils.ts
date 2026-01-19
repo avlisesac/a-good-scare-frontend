@@ -10,13 +10,14 @@ import {
 import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuration";
 import { useAuth } from "../context/AuthContext";
 
-type RegistrationInput = {
+export type RegistrationInput = {
   email: string;
+  username: string;
   password: string;
 };
 
-type LoginInput = {
-  email: string;
+export type LoginInput = {
+  idField: string;
   password: string;
 };
 
@@ -97,7 +98,7 @@ export const register = async (
 ): Promise<RegistrationResponse> => {
   const configuration: AxiosRequestConfig = {
     method: "post",
-    url: "/api/register",
+    url: "/api/auth/register",
     data: {
       ...input,
     },
@@ -306,4 +307,11 @@ export const useGetFullWatchlist = () => {
     getFullWatchlist
   );
   return { ...state, attemptGet: execute };
+};
+
+export const extractAxiosErrorMessage = (err: any) => {
+  if (axios.isAxiosError(err)) {
+    return err.response?.data.message;
+  }
+  return null;
 };

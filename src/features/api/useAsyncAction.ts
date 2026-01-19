@@ -9,12 +9,12 @@ export const useAsyncAction = <TInput, TResult>(
 ) => {
   const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<TResult | null>(null);
-  const [err, setErr] = useState<string | null>(null);
+  const [errMessage, setErrMessage] = useState<string | null>(null);
   const { logout } = useLogout();
 
   const execute = async (input: TInput) => {
     setStatus("loading");
-    setErr(null);
+    setErrMessage(null);
 
     try {
       const result = await action(input);
@@ -30,16 +30,16 @@ export const useAsyncAction = <TInput, TResult>(
           logout("/login");
         }
       }
-      setErr(message);
+      setErrMessage(message);
       setStatus("failed");
-      throw message;
+      throw error;
     }
   };
 
   return {
     status,
     result,
-    err,
+    errMessage,
     execute,
   };
 };

@@ -27,10 +27,6 @@ export const AGSAppBar = () => {
     setAnchorElUser(null);
   };
 
-  useEffect(() => {
-    console.log("user:", user);
-  }, [user]);
-
   return (
     <>
       <AppBar position="static" sx={{ backgroundColor: "black" }}>
@@ -53,7 +49,7 @@ export const AGSAppBar = () => {
           {user && (
             <>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt={user.email}>{user.email[0]}</Avatar>
+                <Avatar alt={user.email}>{user.username[0]}</Avatar>
               </IconButton>
               <Menu
                 sx={{ mt: "45px" }}
