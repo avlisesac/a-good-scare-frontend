@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "../../types/User";
 import axios from "axios";
+import { api } from "../api/utils";
 
 type AuthContextType = {
   user: User | null;
@@ -20,9 +21,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const fetchMe = async () => {
       try {
-        const response = await axios.get("/api/auth/me", {
-          withCredentials: true,
-        });
+        const response = await api.get("/api/auth/me");
         console.log("fetch me response:", response);
         setUser(response.data);
       } catch (err) {
@@ -37,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const logout = async () => {
-    await axios.post("api/auth/logout", {}, { withCredentials: true });
+    await api.post("api/auth/logout");
     setUser(null);
   };
 
