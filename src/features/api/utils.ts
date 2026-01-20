@@ -74,10 +74,12 @@ type LoginResponse = {};
 
 const API_BASE = process.env.REACT_APP_API_URL ?? "";
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
 });
+
+console.log("api base url:", api.defaults.baseURL);
 
 export const useLogout = () => {
   const { user, loading, setUser } = useAuth();
