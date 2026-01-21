@@ -1,4 +1,4 @@
-import { Alert, Box, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Link, TextField, Typography } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { ChangeEvent, useState } from "react";
 import { extractAxiosErrorMessage, LoginInput, useLogin } from "../api/utils";
@@ -56,6 +56,7 @@ export const Login = () => {
         width: "200px",
       }}
     >
+      <Typography variant="h1">Login</Typography>
       <TextField
         label="Username or Email"
         name="idField"
@@ -84,12 +85,16 @@ export const Login = () => {
         Login
       </LoadingButton>
       <Box
-        sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
         <Typography>No account yet?</Typography>
-        <Typography component="a" href="/register">
+        <Button color="secondary" href="register" component={Link}>
           Register here!
-        </Typography>
+        </Button>
       </Box>
     </Box>
   );

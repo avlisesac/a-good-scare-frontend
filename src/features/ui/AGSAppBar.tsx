@@ -13,6 +13,7 @@ import {
 import { Outlet, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
+import { MovieSearch } from "../search/MovieSearch";
 
 export const AGSAppBar = () => {
   const { user, loading, logout } = useAuth();
@@ -41,10 +42,12 @@ export const AGSAppBar = () => {
               fontWeight: 700,
               letterSpacing: "0.3rem",
               marginRight: "auto",
+              fontFamily: ["creepster", "sans-serif"].join(", "),
             }}
           >
             A Good Scare
           </Typography>
+          <MovieSearch />
           {!user && <Button href="/login">Login</Button>}
           {user && (
             <>
