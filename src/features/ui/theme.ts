@@ -5,6 +5,21 @@ export const appTheme = createTheme({
     h1: {
       fontFamily: ["creepster", "roboto"].join(", "),
     },
+    h2: {
+      fontFamily: ["Archivo Black", "roboto"].join(", "),
+    },
+    h3: {
+      fontFamily: ["Archivo Black", "roboto"].join(", "),
+    },
+    h4: {
+      fontFamily: ["Archivo Black", "roboto"].join(", "),
+    },
+    h5: {
+      fontFamily: ["Archivo Black", "roboto"].join(", "),
+    },
+    h6: {
+      fontFamily: ["Archivo Black", "roboto"].join(", "),
+    },
   },
   palette: {
     text: {
