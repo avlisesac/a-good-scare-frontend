@@ -1,4 +1,4 @@
-import { Alert, Box, Button, TextField } from "@mui/material";
+import { Alert, Box, Button, TextField, Typography } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 import { ChangeEvent, FormEventHandler, useState } from "react";
 import { RegistrationInput, useRegister } from "../api/utils";
@@ -65,7 +65,7 @@ export const Register = () => {
         width: "200px",
       }}
     >
-      <h1>Register</h1>
+      <Typography variant="h1">Register</Typography>
       <TextField
         label="Email"
         name="email"

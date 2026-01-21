@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useGetFullWatchlist, WatchlistEntry } from "../api/utils";
 import { MovieCard } from "../ui/MovieCard";
-import { CircularProgress, Dialog, Grid } from "@mui/material";
+import { CircularProgress, Dialog, Grid, Typography } from "@mui/material";
 import { MovieDetails } from "@lorenzopant/tmdb";
 import { MovieDetailsScreen } from "../movies/MovieDetailsScreen";
 import { useTMDBConfig } from "../context/TMDBConfigContext";
@@ -34,7 +34,7 @@ export const Watchlist = () => {
 
   return (
     <>
-      <h1>Watchlist</h1>
+      <Typography variant="h1">Watchlist</Typography>
       {watchlist.length === 0 && <h2>Your watchlist is currently empty</h2>}
       {watchlist.length > 0 && (
         <Grid container spacing={2}>

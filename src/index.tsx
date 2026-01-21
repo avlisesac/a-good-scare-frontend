@@ -11,6 +11,8 @@ import { AGSAppBar } from "./features/ui/AGSAppBar";
 import { AuthProvider } from "./features/context/AuthContext";
 import { Watchlist } from "./features/screens/Watchlist";
 import { TMDBConfigProvider } from "./features/context/TMDBConfigContext";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { appTheme } from "./features/ui/theme";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -19,17 +21,20 @@ root.render(
   <React.StrictMode>
     <AuthProvider>
       <TMDBConfigProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route element={<AGSAppBar />}>
-              <Route index element={<Home />} />
-              <Route path="register" element={<Register />} />
-              <Route path="login" element={<Login />} />
-              <Route path="protected" element={<Protected />} />
-              <Route path="watchlist" element={<Watchlist />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
+        <ThemeProvider theme={appTheme}>
+          <CssBaseline />
+          <BrowserRouter>
+            <Routes>
+              <Route element={<AGSAppBar />}>
+                <Route index element={<Home />} />
+                <Route path="register" element={<Register />} />
+                <Route path="login" element={<Login />} />
+                <Route path="protected" element={<Protected />} />
+                <Route path="watchlist" element={<Watchlist />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </ThemeProvider>
       </TMDBConfigProvider>
     </AuthProvider>
   </React.StrictMode>

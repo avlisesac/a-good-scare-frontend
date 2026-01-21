@@ -56,7 +56,10 @@ export const MovieDetailsScreen = ({
           loading={status === "loading"}
         />
         <RateButton movieId={movie.id} refetchAverage={attemptGet} />
-        <Typography variant="body2" sx={{ color: "text.secondary" }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "text.secondary", paddingTop: 2 }}
+        >
           {movie.overview}
         </Typography>
       </CardContent>

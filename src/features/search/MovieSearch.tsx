@@ -59,10 +59,10 @@ export const MovieSearch = () => {
         loading={searchStatus === "loading"}
         options={searchResult || []}
         filterOptions={(x) => x}
-        sx={{ width: 400 }}
+        sx={{ width: 300 }}
         noOptionsText="Start typing to search for a movie."
         getOptionLabel={(movie) => movie.title}
-        renderInput={(params) => <TextField {...params} label="Movie" />}
+        renderInput={(params) => <TextField {...params} label="Movie Search" />}
         renderOption={({ key, ...props }, option) => (
           <ListItem
             key={option.id}
