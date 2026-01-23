@@ -41,6 +41,15 @@ export type UpdateWatchlistEntryInput = {
   action: WatchlistEntryAction;
 };
 
+export type MovieReview = {
+  id: string;
+  updatedAt: string;
+  reviewText: string;
+  reviewContainsSpoiler: boolean | null;
+  userId: string;
+  username: string;
+};
+
 export type GetWatchlistEntryInput = {
   movieId: number;
 };
@@ -64,13 +73,16 @@ export type GetMovieRatingInput = {
   movieId: number;
 };
 
+export type GetAllReviewsForMovieInput = {
+  movieId: number;
+};
+
 export type RateMovieInput = {
   movieId: number;
   rating?: MovieRatingOptions;
 };
 
 type RegistrationResponse = {};
-type LoginResponse = {};
 
 const API_BASE = process.env.REACT_APP_API_URL ?? "";
 
@@ -156,6 +168,18 @@ export const getUserRating = async ({
   const configuration: AxiosRequestConfig = {
     method: "get",
     url: `/api/rating/${movieId}/${userId}`,
+  };
+
+  const response = await api(configuration);
+  return response.data;
+};
+
+export const getAllReviewsForMovie = async ({
+  movieId,
+}: GetAllReviewsForMovieInput): Promise<MovieReview[]> => {
+  const configuration: AxiosRequestConfig = {
+    method: "get",
+    url: `/api/review/${movieId}`,
   };
 
   const response = await api(configuration);
@@ -308,6 +332,14 @@ export const useGetFullWatchlist = () => {
   const { execute, ...state } = useAsyncAction<void, WatchlistEntry[]>(
     getFullWatchlist
   );
+  return { ...state, attemptGet: execute };
+};
+
+export const useGetAllReviewsForMovie = () => {
+  const { execute, ...state } = useAsyncAction<
+    GetAllReviewsForMovieInput,
+    MovieReview[]
+  >(getAllReviewsForMovie);
   return { ...state, attemptGet: execute };
 };
 

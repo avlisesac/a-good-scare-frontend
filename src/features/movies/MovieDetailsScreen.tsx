@@ -3,10 +3,12 @@ import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuratio
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { RateButton } from "../ui/RateButton";
-import { useGetMovieRating } from "../api/utils";
-import { SetStateAction, useEffect } from "react";
+import { useGetMovieRating, useGetUserRating, UserRating } from "../api/utils";
+import { useEffect, useState } from "react";
 import { OverallRating } from "../ui/OverallRating";
 import { WatchlistButton } from "../ui/WatchlistButton";
+import { MovieReviews } from "./MovieReviews";
+import { useAuth } from "../context/AuthContext";
 
 export type MovieDetailsProps = {
   movie: MovieResultItem | MovieDetails;
@@ -20,6 +22,28 @@ export const MovieDetailsScreen = ({
   fetchAndSetWatchlist,
 }: MovieDetailsProps) => {
   const { result, status, attemptGet } = useGetMovieRating();
+  const { status: getUserRatingStatus, attemptGet: attemptGetUserRating } =
+    useGetUserRating();
+  const { user, loading: loadingUser } = useAuth();
+  const [userRating, setUserRating] = useState<UserRating | null>(null);
+
+  const userRatingFetch = async (userId: string) => {
+    try {
+      const result = await attemptGetUserRating({
+        userId: userId,
+        movieId: movie.id,
+      });
+      setUserRating(result);
+    } catch (err) {
+      console.error("error with initial rating data fetch:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      userRatingFetch(user.id);
+    }
+  }, [user]);
 
   useEffect(() => {
     console.log("result:", result);
@@ -55,10 +79,18 @@ export const MovieDetailsScreen = ({
           rating={result?.average}
           loading={status === "loading"}
         />
-        <RateButton movieId={movie.id} refetchAverage={attemptGet} />
+        <RateButton
+          movieId={movie.id}
+          refetchAverage={attemptGet}
+          userRating={userRating}
+          setUserRating={setUserRating}
+          loadingUser={loadingUser}
+          fetchRatingStatus={getUserRatingStatus}
+        />
         <Typography variant="body2" sx={{ paddingTop: 2 }}>
           {movie.overview}
         </Typography>
+        <MovieReviews movieId={movie.id} userRating={userRating} />
       </CardContent>
     </Card>
   );

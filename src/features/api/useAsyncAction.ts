@@ -2,12 +2,12 @@ import axios, { AxiosResponse } from "axios";
 import { useState } from "react";
 import { useLogout } from "./utils";
 
-type Status = "idle" | "loading" | "success" | "failed";
+export type AsyncActionStatus = "idle" | "loading" | "success" | "failed";
 
 export const useAsyncAction = <TInput, TResult>(
   action: (input: TInput) => Promise<TResult>
 ) => {
-  const [status, setStatus] = useState<Status>("idle");
+  const [status, setStatus] = useState<AsyncActionStatus>("idle");
   const [result, setResult] = useState<TResult | null>(null);
   const [errMessage, setErrMessage] = useState<string | null>(null);
   const { logout } = useLogout();
