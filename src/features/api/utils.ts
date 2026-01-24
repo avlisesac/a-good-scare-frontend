@@ -22,8 +22,8 @@ export type LoginInput = {
 };
 
 type DBDateFields = {
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
   deletedAt?: string;
 };
 
@@ -39,6 +39,14 @@ export type UserRating = DBDateFields & {
 export type UpdateWatchlistEntryInput = {
   movieId: number;
   action: WatchlistEntryAction;
+};
+
+export type MovieReview = DBDateFields & {
+  id: string;
+  reviewText: string;
+  reviewContainsSpoiler: boolean | null;
+  userId: string;
+  username: string;
 };
 
 export type GetWatchlistEntryInput = {
@@ -64,13 +72,21 @@ export type GetMovieRatingInput = {
   movieId: number;
 };
 
+export type GetAllReviewsForMovieInput = {
+  movieId: number;
+};
+
 export type RateMovieInput = {
   movieId: number;
   rating?: MovieRatingOptions;
 };
 
+export type SubmitReviewInput = {
+  movieId: number;
+  review: string;
+};
+
 type RegistrationResponse = {};
-type LoginResponse = {};
 
 const API_BASE = process.env.REACT_APP_API_URL ?? "";
 
@@ -162,6 +178,18 @@ export const getUserRating = async ({
   return response.data;
 };
 
+export const getAllReviewsForMovie = async ({
+  movieId,
+}: GetAllReviewsForMovieInput): Promise<MovieReview[]> => {
+  const configuration: AxiosRequestConfig = {
+    method: "get",
+    url: `/api/review/${movieId}`,
+  };
+
+  const response = await api(configuration);
+  return response.data;
+};
+
 export const getWatchlistEntry = async ({
   movieId,
 }: GetWatchlistEntryInput): Promise<WatchlistEntry> => {
@@ -219,6 +247,22 @@ export const updateWatchlistEntry = async ({
   const configuration: AxiosRequestConfig = {
     method: "post",
     url: `/api/watchlist/${movieId}/${action}`,
+  };
+
+  const response = await api(configuration);
+  return response.data;
+};
+
+export const submitReview = async ({
+  movieId,
+  review,
+}: SubmitReviewInput): Promise<MovieReview> => {
+  const configuration: AxiosRequestConfig = {
+    method: "post",
+    url: `/api/review/${movieId}`,
+    data: {
+      review: review,
+    },
   };
 
   const response = await api(configuration);
@@ -309,6 +353,21 @@ export const useGetFullWatchlist = () => {
     getFullWatchlist
   );
   return { ...state, attemptGet: execute };
+};
+
+export const useGetAllReviewsForMovie = () => {
+  const { execute, ...state } = useAsyncAction<
+    GetAllReviewsForMovieInput,
+    MovieReview[]
+  >(getAllReviewsForMovie);
+  return { ...state, attemptGet: execute };
+};
+
+export const useSubmitReview = () => {
+  const { execute, ...state } = useAsyncAction<SubmitReviewInput, MovieReview>(
+    submitReview
+  );
+  return { ...state, attemptReview: execute };
 };
 
 export const extractAxiosErrorMessage = (err: any) => {

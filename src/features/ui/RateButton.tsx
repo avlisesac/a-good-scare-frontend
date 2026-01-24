@@ -9,25 +9,37 @@ import {
   useGetUserRating,
   MovieRating,
   GetMovieRatingInput,
+  GetAllReviewsForMovieInput,
+  MovieReview,
 } from "../api/utils";
-import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { Dispatch, SetStateAction } from "react";
+import { AsyncActionStatus } from "../api/useAsyncAction";
 
 type RateButtonProps = {
   movieId: number;
+  userRating: UserRating | null;
+  setUserRating: Dispatch<SetStateAction<UserRating | null>>;
+  loadingUser: boolean;
+  fetchRatingStatus: AsyncActionStatus;
   refetchAverage: (input: GetMovieRatingInput) => Promise<MovieRating>;
+  getAndSetMovieReviews: (movieId: number) => Promise<void>;
 };
 
-export const RateButton = ({ movieId, refetchAverage }: RateButtonProps) => {
+export const RateButton = ({
+  movieId,
+  refetchAverage,
+  userRating,
+  setUserRating,
+  loadingUser,
+  fetchRatingStatus,
+  getAndSetMovieReviews,
+}: RateButtonProps) => {
   const { attemptRate, status } = useRateMovie();
-  const { attemptGet, status: initialFetchStatus } = useGetUserRating();
-  const buttonDisablingStatuses = [status, initialFetchStatus];
-  const { user, loading: loadingUser } = useAuth();
-  const [ratingToUse, setRatingToUse] = useState<UserRating | null>(null);
+  const buttonDisablingStatuses = [status, fetchRatingStatus];
 
   const handleRateClick = async (rating: MovieRatingOptions) => {
     let finalRating: MovieRatingOptions = rating;
-    const currentRating = ratingToUse?.rating;
+    const currentRating = userRating?.rating;
     if (currentRating && currentRating === rating) {
       finalRating = null;
     }
@@ -38,35 +50,18 @@ export const RateButton = ({ movieId, refetchAverage }: RateButtonProps) => {
       };
       const result = await attemptRate(ratingInput);
       console.log("result:", result);
-      setRatingToUse(result);
+      setUserRating(result);
       refetchAverage({ movieId });
+      getAndSetMovieReviews(movieId);
     } catch (err) {
       console.error("rating error:", err);
     }
   };
 
-  const initialFetch = async (userId: string) => {
-    try {
-      const result = await attemptGet({
-        userId: userId,
-        movieId,
-      });
-      setRatingToUse(result);
-    } catch (err) {
-      console.error("error with initial rating data fetch:", err);
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      initialFetch(user.id);
-    }
-  }, [user]);
-
   return (
     <ButtonGroup>
       <Button
-        variant={ratingToUse?.rating === "pos" ? "contained" : "outlined"}
+        variant={userRating?.rating === "pos" ? "contained" : "outlined"}
         disabled={buttonDisablingStatuses.includes("loading") || loadingUser}
         onClick={() => handleRateClick("pos")}
         startIcon={<ThumbUpIcon />}
@@ -74,7 +69,7 @@ export const RateButton = ({ movieId, refetchAverage }: RateButtonProps) => {
         Watch
       </Button>
       <Button
-        variant={ratingToUse?.rating === "neg" ? "contained" : "outlined"}
+        variant={userRating?.rating === "neg" ? "contained" : "outlined"}
         disabled={buttonDisablingStatuses.includes("loading") || loadingUser}
         onClick={() => handleRateClick("neg")}
         endIcon={<ThumbDownIcon />}

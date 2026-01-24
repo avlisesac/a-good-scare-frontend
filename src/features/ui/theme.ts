@@ -51,12 +51,29 @@ export const appTheme = createTheme({
         },
       },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          color: "#000",
+        },
+      },
+    },
     MuiInputLabel: {
       styleOverrides: {
         root: {
           color: "#000",
         },
       },
+    },
+    MuiPaper: {
+      variants: [
+        {
+          props: { variant: "outlined" },
+          style: ({ theme }) => ({
+            borderColor: theme.palette.secondary.main,
+          }),
+        },
+      ],
     },
     MuiAutocomplete: {
       styleOverrides: {
