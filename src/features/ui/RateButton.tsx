@@ -1,4 +1,4 @@
-import { Button, ButtonGroup } from "@mui/material";
+import { Box, Button, ButtonGroup } from "@mui/material";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import {
@@ -59,7 +59,7 @@ export const RateButton = ({
   };
 
   return (
-    <ButtonGroup>
+    <Box sx={{ display: "flex", gap: 1 }}>
       <Button
         variant={userRating?.rating === "pos" ? "contained" : "outlined"}
         disabled={buttonDisablingStatuses.includes("loading") || loadingUser}
@@ -76,6 +76,6 @@ export const RateButton = ({
       >
         Skip
       </Button>
-    </ButtonGroup>
+    </Box>
   );
 };
