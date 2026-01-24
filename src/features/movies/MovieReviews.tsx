@@ -4,61 +4,72 @@ import {
   CardActions,
   CardContent,
   CircularProgress,
-  TextField,
+  Grid,
   Typography,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
+  GetAllReviewsForMovieInput,
   MovieReview,
   useGetAllReviewsForMovie,
   UserRating,
+  useSubmitReview,
 } from "../api/utils";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { useAuth } from "../context/AuthContext";
+import { MovieReviewInput } from "./MovieReviewInput";
+import { AsyncActionStatus } from "../api/useAsyncAction";
 
 type MovieReviewsProps = {
   movieId: number;
   userRating: UserRating | null;
+  getAllReviewsStatus: AsyncActionStatus;
+  loggedInUsersReview?: MovieReview;
+  movieReviews: MovieReview[];
+  attemptGetReviews: (
+    input: GetAllReviewsForMovieInput
+  ) => Promise<MovieReview[]>;
+  getAndSetMovieReviews: (movieId: number) => Promise<void>;
 };
 
-export const MovieReviews = ({ movieId, userRating }: MovieReviewsProps) => {
-  // TODO: Rectify "no reviews" vs only one review from the currently logged in usesr.
-  const { attemptGet, status } = useGetAllReviewsForMovie();
-  // TODO: Implement actually submitting (create util entries)
+export const MovieReviews = ({
+  movieId,
+  userRating,
+  getAllReviewsStatus,
+  loggedInUsersReview,
+  movieReviews,
+  attemptGetReviews,
+  getAndSetMovieReviews,
+}: MovieReviewsProps) => {
+  const { attemptReview, status: submitReviewStatus } = useSubmitReview();
   const { user } = useAuth();
-  const [movieReviews, setMovieReviews] = useState<MovieReview[]>([]);
-  const [loggedInUsersReview, setLoggedInUsersReview] = useState<MovieReview>();
   const [reviewFieldDisabled, setReviewFieldDisabled] = useState<boolean>(true);
   const [reviewFieldLabel, setReviewFieldLabel] = useState("");
-  const [buttonText, setButtonText] = useState("");
 
-  // TODO: allow edit.
-  const [editingReview, setEditingReview] = useState("");
+  const [editingReview, setEditingReview] = useState(false);
 
-  // TODO: main review section should filter out the review (if any) that the logged in user made.
-  // That one should live at the top.
+  const requiredApisLoading = [
+    getAllReviewsStatus,
+    submitReviewStatus,
+  ].includes("loading");
 
-  const getAndSetMovieReviews = async (movieId: number) => {
+  const submitMovieReview = async (movieId: number, reviewText: string) => {
     try {
-      const result = await attemptGet({ movieId });
-      console.log("reviews:", result);
-      const loggedInUsersReview = result?.find(
-        (review) => review.userId === user?.id
-      );
-      console.log("loggedInUsersReview:", loggedInUsersReview);
-      setLoggedInUsersReview(loggedInUsersReview);
-      const minusLoggedInUsersReviews = result.filter(
-        (result) => result.userId != user?.id
-      );
-      console.log("minusLoggedInUsersReviews:", minusLoggedInUsersReviews);
-      setMovieReviews(minusLoggedInUsersReviews);
+      const newReview = await attemptReview({
+        movieId,
+        review: reviewText,
+      });
+      console.log("newReview:", newReview);
+      getAndSetMovieReviews(movieId);
+      setEditingReview(false);
     } catch (err) {
-      console.error(err);
+      console.error("error submitting review:", err);
     }
   };
 
   useEffect(() => {
-    let buttonText = "Submit";
     if (!user) {
       setReviewFieldDisabled(true);
       setReviewFieldLabel("You must be logged in to review a movie.");
@@ -69,62 +80,92 @@ export const MovieReviews = ({ movieId, userRating }: MovieReviewsProps) => {
     }
     if (user && userRating?.rating) {
       setReviewFieldDisabled(false);
-      setReviewFieldLabel("Add your review.");
+      setReviewFieldLabel("Your review.");
     }
     if (user && loggedInUsersReview) {
-      setReviewFieldDisabled(true);
-      setReviewFieldLabel(loggedInUsersReview.reviewText);
-      buttonText = "This is your review.";
+      setReviewFieldDisabled(false);
+      setReviewFieldLabel("Your review");
     }
-    setButtonText(buttonText);
   }, [user, loggedInUsersReview, userRating]);
 
-  useEffect(() => {
-    getAndSetMovieReviews(movieId);
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <>
       <Typography variant="h4">Reviews</Typography>
-      <Card sx={{ backgroundColor: "secondary.main" }}>
-        <CardContent>
-          <TextField
-            // Disabled if:
-            // - existing review, kind of. it will be a component swapout
-            id="review-input"
-            disabled={reviewFieldDisabled}
-            label={reviewFieldLabel}
-            multiline
-            rows={3}
-            sx={{ width: "100%", color: "#000" }}
-          />
-          <CardActions>
-            <Button disabled={reviewFieldDisabled} variant="contained">
-              {buttonText}
-            </Button>
-            {loggedInUsersReview && (
-              <Button variant="contained">Edit Review</Button>
-            )}
-          </CardActions>
-        </CardContent>
-      </Card>
-      {status === "loading" && <CircularProgress />}
-      {status === "success" &&
+      {!loggedInUsersReview && (
+        <MovieReviewInput
+          disabled={reviewFieldDisabled || requiredApisLoading}
+          label={reviewFieldLabel}
+          movieId={movieId}
+          editingReview={editingReview}
+          loggedInUsersReview={loggedInUsersReview}
+          submitMovieReview={submitMovieReview}
+          setEditingReview={setEditingReview}
+        />
+      )}
+      {getAllReviewsStatus === "loading" && <CircularProgress />}
+      {getAllReviewsStatus === "success" &&
         (movieReviews?.length ? (
-          movieReviews.map((review) => (
-            <Card
-              sx={{ backgroundColor: "#515151ff", color: "000" }}
-              key={review.id}
-            >
-              <CardContent>
-                <Typography variant="body1">{review.reviewText}</Typography>
-                <Typography sx={{ paddingTop: 2 }} variant="subtitle2">
-                  by {review.username} on{" "}
-                  {format(review.updatedAt, "MMM dd, yyyy @ h aaaa")}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))
+          <Grid container gap={2} sx={{ marginTop: 2 }}>
+            {movieReviews.map((review) => {
+              const isLoggedInUsersReview = review.userId === user?.id;
+              if (isLoggedInUsersReview && editingReview) {
+                return (
+                  <MovieReviewInput
+                    disabled={reviewFieldDisabled || requiredApisLoading}
+                    label={reviewFieldLabel}
+                    movieId={movieId}
+                    editingReview={editingReview}
+                    loggedInUsersReview={loggedInUsersReview}
+                    submitMovieReview={submitMovieReview}
+                    setEditingReview={setEditingReview}
+                  />
+                );
+              }
+              return (
+                <Card
+                  sx={{
+                    backgroundColor: "#515151ff",
+                    color: "000",
+                    outlineColor: "#000",
+                  }}
+                  key={review.id}
+                  variant={isLoggedInUsersReview ? "outlined" : "elevation"}
+                >
+                  <CardContent>
+                    <Typography variant="body1">{review.reviewText}</Typography>
+                    {/* TODO - Add this user's rating of the movie with their review */}
+                    <Typography sx={{ paddingTop: 2 }} variant="subtitle2">
+                      by {review.username} on{" "}
+                      {format(review.createdAt, "MMM dd, yyyy @ h:mm aaaa")}
+                      {review.updatedAt !== review.createdAt
+                        ? ` (updated ${format(
+                            review.updatedAt,
+                            "MMM dd, yyyy @ h:mm aaaa"
+                          )})`
+                        : ""}
+                    </Typography>
+                    {isLoggedInUsersReview && (
+                      <CardActions>
+                        <Button
+                          onClick={() => setEditingReview(true)}
+                          startIcon={<EditIcon />}
+                          variant="contained"
+                        >
+                          Edit
+                        </Button>
+                        {/* TODO - Delete will require a new api endpoint */}
+                        {/* <Button startIcon={<DeleteIcon />} variant="contained">
+                          Delete
+                        </Button> */}
+                      </CardActions>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </Grid>
         ) : (
           <Typography>No reviews yet</Typography>
         ))}

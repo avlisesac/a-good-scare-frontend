@@ -65,6 +65,16 @@ export const appTheme = createTheme({
         },
       },
     },
+    MuiPaper: {
+      variants: [
+        {
+          props: { variant: "outlined" },
+          style: ({ theme }) => ({
+            borderColor: theme.palette.secondary.main,
+          }),
+        },
+      ],
+    },
     MuiAutocomplete: {
       styleOverrides: {
         noOptions: {

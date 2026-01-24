@@ -3,7 +3,13 @@ import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuratio
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { RateButton } from "../ui/RateButton";
-import { useGetMovieRating, useGetUserRating, UserRating } from "../api/utils";
+import {
+  MovieReview,
+  useGetAllReviewsForMovie,
+  useGetMovieRating,
+  useGetUserRating,
+  UserRating,
+} from "../api/utils";
 import { useEffect, useState } from "react";
 import { OverallRating } from "../ui/OverallRating";
 import { WatchlistButton } from "../ui/WatchlistButton";
@@ -21,11 +27,15 @@ export const MovieDetailsScreen = ({
   tmdbConfig,
   fetchAndSetWatchlist,
 }: MovieDetailsProps) => {
-  const { result, status, attemptGet } = useGetMovieRating();
+  const { result, status, attemptGet: attemptGetRating } = useGetMovieRating();
+  const { attemptGet: attemptGetReviews, status: getAllReviewsStatus } =
+    useGetAllReviewsForMovie();
   const { status: getUserRatingStatus, attemptGet: attemptGetUserRating } =
     useGetUserRating();
   const { user, loading: loadingUser } = useAuth();
   const [userRating, setUserRating] = useState<UserRating | null>(null);
+  const [movieReviews, setMovieReviews] = useState<MovieReview[]>([]);
+  const [loggedInUsersReview, setLoggedInUsersReview] = useState<MovieReview>();
 
   const userRatingFetch = async (userId: string) => {
     try {
@@ -36,6 +46,21 @@ export const MovieDetailsScreen = ({
       setUserRating(result);
     } catch (err) {
       console.error("error with initial rating data fetch:", err);
+    }
+  };
+
+  const getAndSetMovieReviews = async (movieId: number) => {
+    try {
+      const result = await attemptGetReviews({ movieId });
+      console.log("reviews:", result);
+      const loggedInUsersReview = result?.find(
+        (review) => review.userId === user?.id
+      );
+      console.log("loggedInUsersReview:", loggedInUsersReview);
+      setLoggedInUsersReview(loggedInUsersReview);
+      setMovieReviews(result);
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -50,9 +75,10 @@ export const MovieDetailsScreen = ({
   }, [result]);
 
   useEffect(() => {
-    attemptGet({
+    attemptGetRating({
       movieId: movie.id,
     });
+    getAndSetMovieReviews(movie.id);
   }, []);
 
   return (
@@ -81,16 +107,25 @@ export const MovieDetailsScreen = ({
         />
         <RateButton
           movieId={movie.id}
-          refetchAverage={attemptGet}
+          refetchAverage={attemptGetRating}
           userRating={userRating}
           setUserRating={setUserRating}
           loadingUser={loadingUser}
           fetchRatingStatus={getUserRatingStatus}
+          getAndSetMovieReviews={getAndSetMovieReviews}
         />
         <Typography variant="body2" sx={{ paddingTop: 2 }}>
           {movie.overview}
         </Typography>
-        <MovieReviews movieId={movie.id} userRating={userRating} />
+        <MovieReviews
+          movieId={movie.id}
+          userRating={userRating}
+          getAllReviewsStatus={getAllReviewsStatus}
+          loggedInUsersReview={loggedInUsersReview}
+          movieReviews={movieReviews}
+          attemptGetReviews={attemptGetReviews}
+          getAndSetMovieReviews={getAndSetMovieReviews}
+        />
       </CardContent>
     </Card>
   );

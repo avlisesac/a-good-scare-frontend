@@ -22,8 +22,8 @@ export type LoginInput = {
 };
 
 type DBDateFields = {
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt: string;
+  updatedAt: string;
   deletedAt?: string;
 };
 
@@ -41,9 +41,8 @@ export type UpdateWatchlistEntryInput = {
   action: WatchlistEntryAction;
 };
 
-export type MovieReview = {
+export type MovieReview = DBDateFields & {
   id: string;
-  updatedAt: string;
   reviewText: string;
   reviewContainsSpoiler: boolean | null;
   userId: string;
@@ -80,6 +79,11 @@ export type GetAllReviewsForMovieInput = {
 export type RateMovieInput = {
   movieId: number;
   rating?: MovieRatingOptions;
+};
+
+export type SubmitReviewInput = {
+  movieId: number;
+  review: string;
 };
 
 type RegistrationResponse = {};
@@ -249,6 +253,22 @@ export const updateWatchlistEntry = async ({
   return response.data;
 };
 
+export const submitReview = async ({
+  movieId,
+  review,
+}: SubmitReviewInput): Promise<MovieReview> => {
+  const configuration: AxiosRequestConfig = {
+    method: "post",
+    url: `/api/review/${movieId}`,
+    data: {
+      review: review,
+    },
+  };
+
+  const response = await api(configuration);
+  return response.data;
+};
+
 export const useLogin = () => {
   const { execute, ...state } = useAsyncAction<LoginInput, AxiosResponse>(
     login
@@ -341,6 +361,13 @@ export const useGetAllReviewsForMovie = () => {
     MovieReview[]
   >(getAllReviewsForMovie);
   return { ...state, attemptGet: execute };
+};
+
+export const useSubmitReview = () => {
+  const { execute, ...state } = useAsyncAction<SubmitReviewInput, MovieReview>(
+    submitReview
+  );
+  return { ...state, attemptReview: execute };
 };
 
 export const extractAxiosErrorMessage = (err: any) => {

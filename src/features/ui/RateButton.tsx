@@ -9,6 +9,8 @@ import {
   useGetUserRating,
   MovieRating,
   GetMovieRatingInput,
+  GetAllReviewsForMovieInput,
+  MovieReview,
 } from "../api/utils";
 import { Dispatch, SetStateAction } from "react";
 import { AsyncActionStatus } from "../api/useAsyncAction";
@@ -20,6 +22,7 @@ type RateButtonProps = {
   loadingUser: boolean;
   fetchRatingStatus: AsyncActionStatus;
   refetchAverage: (input: GetMovieRatingInput) => Promise<MovieRating>;
+  getAndSetMovieReviews: (movieId: number) => Promise<void>;
 };
 
 export const RateButton = ({
@@ -29,6 +32,7 @@ export const RateButton = ({
   setUserRating,
   loadingUser,
   fetchRatingStatus,
+  getAndSetMovieReviews,
 }: RateButtonProps) => {
   const { attemptRate, status } = useRateMovie();
   const buttonDisablingStatuses = [status, fetchRatingStatus];
@@ -48,6 +52,7 @@ export const RateButton = ({
       console.log("result:", result);
       setUserRating(result);
       refetchAverage({ movieId });
+      getAndSetMovieReviews(movieId);
     } catch (err) {
       console.error("rating error:", err);
     }
