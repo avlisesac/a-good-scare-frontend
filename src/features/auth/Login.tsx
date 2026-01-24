@@ -80,7 +80,6 @@ export const Login = () => {
         type="submit"
         variant="contained"
         loading={status === "loading"}
-        // disabled={status === "loading"}
       >
         Login
       </LoadingButton>

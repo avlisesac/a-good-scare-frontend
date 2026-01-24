@@ -36,18 +36,22 @@ export const appTheme = createTheme({
     secondary: {
       main: "#C2FF51",
     },
-    // secondary: {
-    //   main: "#fff",
-    // },
+    action: {
+      disabledOpacity: 0.6,
+      disabledBackground: "#90A1B9",
+    },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          cursor: "pointer",
+          "&.MuiLoadingButton-loading": {
+            color: "#fff", // spinner becomes visible
+          },
         },
       },
     },
+
     MuiTextField: {
       styleOverrides: {
         root: {

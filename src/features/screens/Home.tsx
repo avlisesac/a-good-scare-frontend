@@ -97,7 +97,8 @@ export const Home = () => {
         <Grid>
           <Typography>Features coming soon:</Typography>
           <ul>
-            <li>Reviews (with spoiler tags!)</li>
+            <li>Spoiler tags for reviews</li>
+            <li>Ability to delete a review that you've left</li>
             <li>Personal rate/review activity list</li>
             <li>
               On homescreen:

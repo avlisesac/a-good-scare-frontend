@@ -14,6 +14,7 @@ import {
 } from "../api/utils";
 import { Dispatch, SetStateAction } from "react";
 import { AsyncActionStatus } from "../api/useAsyncAction";
+import { LoadingButton } from "@mui/lab";
 
 type RateButtonProps = {
   movieId: number;
@@ -60,22 +61,24 @@ export const RateButton = ({
 
   return (
     <Box sx={{ display: "flex", gap: 1 }}>
-      <Button
+      <LoadingButton
         variant={userRating?.rating === "pos" ? "contained" : "outlined"}
-        disabled={buttonDisablingStatuses.includes("loading") || loadingUser}
+        disabled={loadingUser}
+        loading={buttonDisablingStatuses.includes("loading")}
         onClick={() => handleRateClick("pos")}
         startIcon={<ThumbUpIcon />}
       >
         Watch
-      </Button>
-      <Button
+      </LoadingButton>
+      <LoadingButton
         variant={userRating?.rating === "neg" ? "contained" : "outlined"}
-        disabled={buttonDisablingStatuses.includes("loading") || loadingUser}
+        disabled={loadingUser}
+        loading={buttonDisablingStatuses.includes("loading")}
         onClick={() => handleRateClick("neg")}
         endIcon={<ThumbDownIcon />}
       >
         Skip
-      </Button>
+      </LoadingButton>
     </Box>
   );
 };
