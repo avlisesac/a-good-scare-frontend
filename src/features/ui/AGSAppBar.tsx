@@ -70,6 +70,9 @@ export const AGSAppBar = () => {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
+                <MenuItem disabled>
+                  <Typography variant="caption">{user.username}</Typography>
+                </MenuItem>
                 <MenuItem
                   onClick={() => {
                     logout();

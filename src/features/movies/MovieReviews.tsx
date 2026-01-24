@@ -95,7 +95,8 @@ export const MovieReviews = ({
       <Typography variant="h4">Reviews</Typography>
       {!loggedInUsersReview && (
         <MovieReviewInput
-          disabled={reviewFieldDisabled || requiredApisLoading}
+          disabled={reviewFieldDisabled || getAllReviewsStatus === "loading"}
+          loading={submitReviewStatus === "loading"}
           label={reviewFieldLabel}
           movieId={movieId}
           editingReview={editingReview}
@@ -113,7 +114,8 @@ export const MovieReviews = ({
               if (isLoggedInUsersReview && editingReview) {
                 return (
                   <MovieReviewInput
-                    disabled={reviewFieldDisabled || requiredApisLoading}
+                    disabled={reviewFieldDisabled}
+                    loading={submitReviewStatus === "loading"}
                     label={reviewFieldLabel}
                     movieId={movieId}
                     editingReview={editingReview}

@@ -88,6 +88,7 @@ export const MovieSearch = () => {
         )}
       />
       <Dialog onClose={() => setSelectedMovie(null)} open={!!selectedMovie}>
+        {/* TODO: Need to be able to update the watchlist while on the watchlist screen. Will likely require a piece of Context */}
         {selectedMovie && tmdbConfig && (
           <MovieDetailsScreen movie={selectedMovie} tmdbConfig={tmdbConfig} />
         )}
