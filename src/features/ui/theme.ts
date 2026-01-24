@@ -44,12 +44,7 @@ export const appTheme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          // Disable hover on touch devices (iOS fix)
-          "@media (hover: none)": {
-            "&:hover": {
-              backgroundColor: "inherit",
-            },
-          },
+          cursor: "pointer",
         },
       },
     },
