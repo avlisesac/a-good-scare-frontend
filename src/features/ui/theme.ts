@@ -41,6 +41,18 @@ export const appTheme = createTheme({
     // },
   },
   components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          // Disable hover on touch devices (iOS fix)
+          "@media (hover: none)": {
+            "&:hover": {
+              backgroundColor: "inherit",
+            },
+          },
+        },
+      },
+    },
     MuiTextField: {
       styleOverrides: {
         root: {
