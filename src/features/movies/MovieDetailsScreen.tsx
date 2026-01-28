@@ -32,7 +32,8 @@ export const MovieDetailsScreen = ({
     useGetAllReviewsForMovie();
   const { status: getUserRatingStatus, attemptGet: attemptGetUserRating } =
     useGetUserRating();
-  const { user, loading: loadingUser } = useAuth();
+  const { user, initialFetchLoading, authLoading } = useAuth();
+  const loadingUser = initialFetchLoading || authLoading;
   const [userRating, setUserRating] = useState<UserRating | null>(null);
   const [movieReviews, setMovieReviews] = useState<MovieReview[]>([]);
   const [loggedInUsersReview, setLoggedInUsersReview] = useState<MovieReview>();

@@ -1,6 +1,5 @@
 import { Alert, Box, Button, TextField, Typography } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { ChangeEvent, FormEventHandler, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { RegistrationInput, useRegister } from "../api/utils";
 import { useNavigate } from "react-router";
 import axios from "axios";
@@ -94,14 +93,14 @@ export const Register = () => {
         required
       />
       {registerError && <Alert severity="error">{registerError}</Alert>}
-      <LoadingButton
+      <Button
         type="submit"
         variant="contained"
         loading={status === "loading"}
-        // disabled={status === "loading"}
+        loadingPosition="start"
       >
         Register
-      </LoadingButton>
+      </Button>
     </Box>
   );
 };

@@ -22,6 +22,7 @@ export const appTheme = createTheme({
     },
   },
   palette: {
+    mode: "dark",
     text: {
       primary: "#fff",
       secondary: "#fff",
@@ -42,16 +43,6 @@ export const appTheme = createTheme({
     },
   },
   components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          "&.MuiLoadingButton-loading": {
-            color: "#fff", // spinner becomes visible
-          },
-        },
-      },
-    },
-
     MuiTextField: {
       styleOverrides: {
         root: {
@@ -85,13 +76,6 @@ export const appTheme = createTheme({
           }),
         },
       ],
-    },
-    MuiAutocomplete: {
-      styleOverrides: {
-        noOptions: {
-          color: "#fff",
-        },
-      },
     },
   },
 });

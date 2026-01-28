@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User } from "../../types/User";
-import axios from "axios";
-import { api } from "../api/utils";
+import { api, extractAxiosErrorMessage, LoginInput } from "../api/utils";
 
 type AuthContextType = {
   user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  loading: boolean;
+  initialFetchLoading: boolean;
+  authLoading: boolean;
+  error: string | null;
+  login: (input: LoginInput) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -16,7 +17,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialFetchLoading, setInitialFetchLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -28,20 +31,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         console.error("fetch me error:", err);
         setUser(null);
       } finally {
-        setLoading(false);
+        setInitialFetchLoading(false);
       }
     };
 
     fetchMe();
   }, []);
 
+  const login = async (input: LoginInput) => {
+    setAuthLoading(true);
+    setError(null);
+
+    try {
+      const res = await api.post("/api/auth/login", input);
+      const user = res.data.user;
+      setUser(user);
+      return user;
+    } catch (err) {
+      const message = extractAxiosErrorMessage(err);
+      setError(message || "Login failed.");
+      throw err; // allow component-level handling if needed
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
   const logout = async () => {
-    await api.post("api/auth/logout");
-    setUser(null);
+    setAuthLoading(true);
+    try {
+      await api.post("/api/auth/logout");
+      setUser(null);
+    } catch (err) {
+      console.error(err);
+      const message = extractAxiosErrorMessage(err);
+      setError(message || "Error logging out");
+    }
+    setAuthLoading(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        initialFetchLoading,
+        authLoading,
+        error,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

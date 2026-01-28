@@ -7,7 +7,7 @@ import {
   WatchlistEntryAction,
 } from "../api/utils";
 import { useEffect, useState } from "react";
-import { LoadingButton } from "@mui/lab";
+import { Button } from "@mui/material";
 
 export type WatchlistButtonProps = {
   movieId: number;
@@ -68,7 +68,7 @@ export const WatchlistButton = ({
   };
 
   return (
-    <LoadingButton
+    <Button
       aria-label="add-movie-to-watchlist"
       variant={wantToWatch ? "outlined" : "contained"}
       sx={{
@@ -77,11 +77,11 @@ export const WatchlistButton = ({
         top: `1rem`,
       }}
       loading={anyApiLoading}
-      disabled={anyApiLoading}
+      loadingPosition="start"
       startIcon={wantToWatch ? <BookmarkRemoveIcon /> : <BookmarkAddIcon />}
       onClick={() => handleButtonClick(movieId, wantToWatch)}
     >
       {wantToWatch ? `Remove from Watchlist` : `Add to Watchlist`}
-    </LoadingButton>
+    </Button>
   );
 };

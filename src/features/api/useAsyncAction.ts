@@ -1,6 +1,7 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { useState } from "react";
-import { useLogout } from "./utils";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router";
 
 export type AsyncActionStatus = "idle" | "loading" | "success" | "failed";
 
@@ -10,7 +11,8 @@ export const useAsyncAction = <TInput, TResult>(
   const [status, setStatus] = useState<AsyncActionStatus>("idle");
   const [result, setResult] = useState<TResult | null>(null);
   const [errMessage, setErrMessage] = useState<string | null>(null);
-  const { logout } = useLogout();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const execute = async (input: TInput) => {
     setStatus("loading");
@@ -27,7 +29,8 @@ export const useAsyncAction = <TInput, TResult>(
       if (axios.isAxiosError(error)) {
         message = error.response?.data?.message;
         if (error.response?.data?.error?.name === "TokenExpiredError") {
-          logout("/login");
+          logout();
+          navigate("/login");
         }
       }
       setErrMessage(message);

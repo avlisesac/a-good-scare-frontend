@@ -1,7 +1,6 @@
 import { Alert, Box, Button, Link, TextField, Typography } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
 import { ChangeEvent, useState } from "react";
-import { extractAxiosErrorMessage, LoginInput, useLogin } from "../api/utils";
+import { LoginInput } from "../api/utils";
 import { useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 
@@ -10,15 +9,13 @@ export const Login = () => {
     idField: "",
     password: "",
   });
-  const { status, attemptLogin } = useLogin();
-  const [loginError, setLoginError] = useState<String | null>(null);
+  const { login, initialFetchLoading, authLoading, error } = useAuth();
+  const loadingUser = initialFetchLoading || authLoading;
   const navigate = useNavigate();
-  const { setUser } = useAuth();
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setLoginError(null);
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -26,22 +23,11 @@ export const Login = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("submitting login form w/:", formData);
-    setLoginError(null);
     try {
-      const result = await attemptLogin({
-        idField: formData.idField,
-        password: formData.password,
-      });
-      const user = result.data?.user;
-      if (user) {
-        console.log("user (Login):", user);
-        setUser(user);
-        navigate("/");
-      }
+      const result = await login(formData);
+      navigate("/");
     } catch (err) {
       console.error(err);
-      const extractedMessage = extractAxiosErrorMessage(err);
-      setLoginError(extractedMessage || "Unknown error when logging in.");
     }
   };
 
@@ -62,7 +48,7 @@ export const Login = () => {
         name="idField"
         value={formData.idField}
         onChange={handleChange}
-        disabled={status === "loading"}
+        disabled={loadingUser}
         fullWidth
         required
       />
@@ -71,18 +57,19 @@ export const Login = () => {
         name="password"
         value={formData.password}
         onChange={handleChange}
-        disabled={status === "loading"}
+        disabled={loadingUser}
         fullWidth
         required
       />
-      {loginError && <Alert severity="error">{loginError}</Alert>}
-      <LoadingButton
+      {error && <Alert severity="error">{error}</Alert>}
+      <Button
         type="submit"
         variant="contained"
-        loading={status === "loading"}
+        loading={loadingUser}
+        loadingPosition="start"
       >
         Login
-      </LoadingButton>
+      </Button>
       <Box
         sx={{
           display: "flex",
