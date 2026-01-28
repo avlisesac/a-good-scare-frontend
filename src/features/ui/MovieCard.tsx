@@ -17,7 +17,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MovieDetails } from "@lorenzopant/tmdb";
 import { format } from "date-fns";
 import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuration";
-import { LoadingButton } from "@mui/lab";
 
 export type MovieCard = {
   movieId: number;
@@ -95,14 +94,15 @@ export const MovieCard = ({
             </CardContent>
           </CardActionArea>
           <CardActions sx={{ marginTop: "auto" }}>
-            <LoadingButton
+            <Button
               onClick={() => handleRemoveClick(movieId)}
               loading={updateWatchlistStatus === "loading"}
+              loadingPosition="start"
               size="small"
               variant="outlined"
             >
               Remove from watchlist
-            </LoadingButton>
+            </Button>
           </CardActions>
         </Card>
       </>

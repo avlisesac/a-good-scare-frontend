@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import {
@@ -6,15 +6,11 @@ import {
   UserRating,
   RateMovieInput,
   useRateMovie,
-  useGetUserRating,
   MovieRating,
   GetMovieRatingInput,
-  GetAllReviewsForMovieInput,
-  MovieReview,
 } from "../api/utils";
 import { Dispatch, SetStateAction } from "react";
 import { AsyncActionStatus } from "../api/useAsyncAction";
-import { LoadingButton } from "@mui/lab";
 
 type RateButtonProps = {
   movieId: number;
@@ -61,24 +57,26 @@ export const RateButton = ({
 
   return (
     <Box sx={{ display: "flex", gap: 1 }}>
-      <LoadingButton
+      <Button
         variant={userRating?.rating === "pos" ? "contained" : "outlined"}
         disabled={loadingUser}
         loading={buttonDisablingStatuses.includes("loading")}
+        loadingPosition="start"
         onClick={() => handleRateClick("pos")}
         startIcon={<ThumbUpIcon />}
       >
         Watch
-      </LoadingButton>
-      <LoadingButton
+      </Button>
+      <Button
         variant={userRating?.rating === "neg" ? "contained" : "outlined"}
         disabled={loadingUser}
         loading={buttonDisablingStatuses.includes("loading")}
+        loadingPosition="start"
         onClick={() => handleRateClick("neg")}
         endIcon={<ThumbDownIcon />}
       >
         Skip
-      </LoadingButton>
+      </Button>
     </Box>
   );
 };

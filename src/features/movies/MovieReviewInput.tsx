@@ -13,7 +13,6 @@ import {
   useState,
 } from "react";
 import { MovieReview } from "../api/utils";
-import { LoadingButton } from "@mui/lab";
 
 export type MovieReviewInputProps = {
   disabled: boolean;
@@ -65,8 +64,9 @@ export const MovieReviewInput = ({
           sx={{ width: "100%", color: "#000" }}
         />
         <CardActions>
-          <LoadingButton
+          <Button
             loading={loading}
+            loadingPosition="start"
             disabled={
               disabled || loggedInUsersReview?.reviewText === reviewText
             }
@@ -78,7 +78,7 @@ export const MovieReviewInput = ({
             }}
           >
             Submit
-          </LoadingButton>
+          </Button>
           {editingReview && (
             <Button
               disabled={disabled}

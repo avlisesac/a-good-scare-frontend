@@ -3,6 +3,7 @@ import {
   Avatar,
   Box,
   Button,
+  CircularProgress,
   Container,
   IconButton,
   Menu,
@@ -16,7 +17,8 @@ import { useState } from "react";
 import { MovieSearch } from "../search/MovieSearch";
 
 export const AGSAppBar = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, initialFetchLoading, authLoading, logout } = useAuth();
+  const loadingUser = initialFetchLoading || authLoading;
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const navigate = useNavigate();
 
@@ -48,11 +50,23 @@ export const AGSAppBar = () => {
             A Good Scare
           </Typography>
           <MovieSearch />
-          {!user && <Button href="/login">Login</Button>}
+          {!user && (
+            <Button loadingPosition="start" loading={loadingUser} href="/login">
+              Login
+            </Button>
+          )}
           {user && (
             <>
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt={user.email}>{user.username?.[0]}</Avatar>
+              <IconButton
+                loading={loadingUser}
+                onClick={handleOpenUserMenu}
+                sx={{ p: 0 }}
+              >
+                {loadingUser ? (
+                  <CircularProgress />
+                ) : (
+                  <Avatar alt={user.email}>{user.username?.[0]}</Avatar>
+                )}
               </IconButton>
               <Menu
                 sx={{ mt: "45px" }}

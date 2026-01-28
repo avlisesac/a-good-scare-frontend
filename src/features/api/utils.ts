@@ -97,18 +97,6 @@ export const api = axios.create({
 
 console.log("api base url:", api.defaults.baseURL);
 
-export const useLogout = () => {
-  const { user, loading, setUser } = useAuth();
-  const navigate = useNavigate();
-
-  const logout = (destination: string) => {
-    setUser(null);
-    navigate(destination);
-  };
-
-  return { logout };
-};
-
 const tmdb = new TMDB(process.env.REACT_APP_TMDB_ACCESS_TOKEN ?? "");
 
 export const register = async (

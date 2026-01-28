@@ -1,9 +1,17 @@
-import { Button, Card, CardContent, Grid, Typography } from "@mui/material";
+import {
+  Alert,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  Typography,
+} from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router";
 
 export const Home = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, initialFetchLoading, authLoading, logout } = useAuth();
+  const loadingUser = initialFetchLoading || authLoading;
   const navigate = useNavigate();
 
   return (
@@ -23,6 +31,14 @@ export const Home = () => {
           A rating and review site for horror fans.
         </Typography>
       </Grid>
+      <Grid>
+        <Alert variant="filled" severity="warning">
+          Notice: This site is currently on a free hosting instance. Due to
+          this, initial requests may take a while to resolve after periods of
+          inactivity. This may take up to one minute, but subsequent requests
+          will not suffer this delay.
+        </Alert>
+      </Grid>
       {!user && (
         <Grid
           sx={{
@@ -36,6 +52,8 @@ export const Home = () => {
             variant="contained"
             size="large"
             color="secondary"
+            loading={loadingUser}
+            loadingPosition="start"
             onClick={() => navigate("/login")}
           >
             Login
@@ -44,6 +62,8 @@ export const Home = () => {
             variant="contained"
             size="large"
             color="secondary"
+            loading={loadingUser}
+            loadingPosition="start"
             onClick={() => navigate("/register")}
           >
             Register
