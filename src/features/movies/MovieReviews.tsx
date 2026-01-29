@@ -1,14 +1,17 @@
 import {
+  Box,
   Button,
   Card,
   CardActions,
   CardContent,
   CircularProgress,
   Grid,
+  Icon,
   Typography,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import {
   GetAllReviewsForMovieInput,
   MovieReview,
@@ -49,11 +52,6 @@ export const MovieReviews = ({
   const [reviewFieldLabel, setReviewFieldLabel] = useState("");
 
   const [editingReview, setEditingReview] = useState(false);
-
-  const requiredApisLoading = [
-    getAllReviewsStatus,
-    submitReviewStatus,
-  ].includes("loading");
 
   const submitMovieReview = async (movieId: number, reviewText: string) => {
     try {
@@ -136,8 +134,20 @@ export const MovieReviews = ({
                   variant={isLoggedInUsersReview ? "outlined" : "elevation"}
                 >
                   <CardContent>
-                    <Typography variant="body1">{review.reviewText}</Typography>
-                    {/* TODO - Add this user's rating of the movie with their review */}
+                    {/* <Grid container sx={{ gap: 2 }}> */}
+                    <Box
+                      sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
+                    >
+                      <Icon
+                        component={
+                          review.rating === "pos" ? ThumbUpIcon : ThumbDownIcon
+                        }
+                      ></Icon>
+                      <Typography variant="body1">
+                        {review.reviewText}
+                      </Typography>
+                      {/* TODO - Add this user's rating of the movie with their review */}
+                    </Box>
                     <Typography sx={{ paddingTop: 2 }} variant="subtitle2">
                       by {review.username} on{" "}
                       {format(review.createdAt, "MMM dd, yyyy @ h:mm aaaa")}
@@ -148,6 +158,7 @@ export const MovieReviews = ({
                           )})`
                         : ""}
                     </Typography>
+                    {/* </Grid> */}
                     {isLoggedInUsersReview && (
                       <CardActions>
                         <Button

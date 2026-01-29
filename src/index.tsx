@@ -38,6 +38,8 @@ export const getErrorMessage = (error: unknown): string => {
   return "Something went wrong. Please try again";
 };
 
+// TODO: Move rating and review queries/mutations to the tanstack setup
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
