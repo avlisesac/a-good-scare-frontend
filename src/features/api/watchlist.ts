@@ -9,18 +9,22 @@ import {
   WatchlistEntryAction,
 } from "./utils";
 
-export const useWatchlist = () => {
+export const useWatchlist = (enabled: boolean) => {
   return useQuery<WatchlistEntry[]>({
     queryKey: ["watchlist"],
     queryFn: getFullWatchlist,
+    enabled,
   });
 };
 
-export const useWatchlistEntry = (input: GetWatchlistEntryInput) => {
+export const useWatchlistEntry = (
+  input: GetWatchlistEntryInput,
+  enabled: boolean
+) => {
   return useQuery<WatchlistEntry>({
     queryKey: ["watchlist-entry", input.movieId],
     queryFn: () => getWatchlistEntry(input),
-    enabled: !!input.movieId,
+    enabled: !!input.movieId && enabled,
   });
 };
 

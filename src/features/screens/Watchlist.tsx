@@ -5,13 +5,17 @@ import { MovieDetails } from "@lorenzopant/tmdb";
 import { MovieDetailsScreen } from "../movies/MovieDetailsScreen";
 import { useTMDBConfig } from "../context/TMDBConfigContext";
 import { useWatchlist } from "../api/watchlist";
+import { useAuth } from "../context/AuthContext";
 
 export const Watchlist = () => {
-  const { data: watchlist, isPending } = useWatchlist();
+  const { user, authLoading, initialFetchLoading } = useAuth();
+  const canFetchWatchlist = !!user && !authLoading && !initialFetchLoading;
+
+  const { data: watchlist, isLoading } = useWatchlist(canFetchWatchlist);
   const [selectedMovie, setSelectedMovie] = useState<MovieDetails | null>(null);
   const { tmdbConfig, loading: tmdbConfigLoading } = useTMDBConfig();
 
-  if (isPending) {
+  if (isLoading) {
     return <CircularProgress />;
   }
 

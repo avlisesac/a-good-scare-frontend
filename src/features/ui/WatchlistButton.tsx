@@ -2,18 +2,23 @@ import BookmarkAddIcon from "@mui/icons-material/BookmarkAdd";
 import BookmarkRemoveIcon from "@mui/icons-material/BookmarkRemove";
 import { Button } from "@mui/material";
 import { useUpdateWatchlistEntry, useWatchlistEntry } from "../api/watchlist";
+import { useAuth } from "../context/AuthContext";
 
 export type WatchlistButtonProps = {
   movieId: number;
 };
 
 export const WatchlistButton = ({ movieId }: WatchlistButtonProps) => {
+  const { user, authLoading, initialFetchLoading } = useAuth();
+  const canFetchWatchlistEntry = !!user && !authLoading && !initialFetchLoading;
+
   const { mutateAsync, isPending: updateIsPending } = useUpdateWatchlistEntry();
-  const { data: watchlistEntry, isPending: fetchIsPending } = useWatchlistEntry(
-    { movieId }
+  const { data: watchlistEntry, isLoading: fetchIsLoading } = useWatchlistEntry(
+    { movieId },
+    canFetchWatchlistEntry
   );
 
-  const anyApiLoading = fetchIsPending || updateIsPending;
+  const anyApiLoading = fetchIsLoading || updateIsPending;
 
   const wantToWatch = watchlistEntry?.toWatch;
 

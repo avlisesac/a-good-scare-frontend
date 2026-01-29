@@ -13,13 +13,49 @@ import { Watchlist } from "./features/screens/Watchlist";
 import { TMDBConfigProvider } from "./features/context/TMDBConfigContext";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { appTheme } from "./features/ui/theme";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import toast, { Toaster } from "react-hot-toast";
+import { isAxiosError } from "axios";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
-const queryClient = new QueryClient();
+export const getErrorMessage = (error: unknown): string => {
+  if (isAxiosError(error))
+    return (
+      error.response?.data.message ||
+      error.message ||
+      "An unknown network error occured."
+    );
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "Something went wrong. Please try again";
+};
+
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+  queryCache: new QueryCache({
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+    },
+  }),
+});
 
 root.render(
   <React.StrictMode>
@@ -28,6 +64,7 @@ root.render(
         <TMDBConfigProvider>
           <ThemeProvider theme={appTheme}>
             <CssBaseline />
+            <Toaster position="bottom-left" />
             <BrowserRouter>
               <Routes>
                 <Route element={<AGSAppBar />}>
