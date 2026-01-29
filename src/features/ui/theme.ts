@@ -77,5 +77,12 @@ export const appTheme = createTheme({
         },
       ],
     },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundImage: "none",
+        },
+      },
+    },
   },
 });
