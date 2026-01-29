@@ -19,13 +19,11 @@ import { useAuth } from "../context/AuthContext";
 export type MovieDetailsProps = {
   movie: MovieResultItem | MovieDetails;
   tmdbConfig: ConfigurationResponse;
-  fetchAndSetWatchlist?: () => Promise<void>;
 };
 
 export const MovieDetailsScreen = ({
   movie,
   tmdbConfig,
-  fetchAndSetWatchlist,
 }: MovieDetailsProps) => {
   const { result, status, attemptGet: attemptGetRating } = useGetMovieRating();
   const { attemptGet: attemptGetReviews, status: getAllReviewsStatus } =
@@ -84,10 +82,7 @@ export const MovieDetailsScreen = ({
 
   return (
     <Card sx={{ maxWidth: 500, maxHeight: "80%", overflow: "scroll", p: 2 }}>
-      <WatchlistButton
-        movieId={movie.id}
-        postUpdateAction={fetchAndSetWatchlist}
-      />
+      <WatchlistButton movieId={movie.id} />
       <CardMedia
         component="img"
         sx={{ width: 154 }}

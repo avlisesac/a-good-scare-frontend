@@ -320,29 +320,6 @@ export const useGetMovieRating = () => {
   return { ...state, attemptGet: execute };
 };
 
-export const useUpdateWatchlistEntry = () => {
-  const { execute, ...state } = useAsyncAction<
-    UpdateWatchlistEntryInput,
-    WatchlistEntry
-  >(updateWatchlistEntry);
-  return { ...state, attemptUpdate: execute };
-};
-
-export const useGetWatchlistEntry = () => {
-  const { execute, ...state } = useAsyncAction<
-    GetWatchlistEntryInput,
-    WatchlistEntry
-  >(getWatchlistEntry);
-  return { ...state, attemptGet: execute };
-};
-
-export const useGetFullWatchlist = () => {
-  const { execute, ...state } = useAsyncAction<void, WatchlistEntry[]>(
-    getFullWatchlist
-  );
-  return { ...state, attemptGet: execute };
-};
-
 export const useGetAllReviewsForMovie = () => {
   const { execute, ...state } = useAsyncAction<
     GetAllReviewsForMovieInput,

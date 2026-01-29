@@ -8,19 +8,15 @@ import {
   CircularProgress,
   Typography,
 } from "@mui/material";
-import {
-  UpdateWatchlistEntryInput,
-  useGetTmdbDetails,
-  useUpdateWatchlistEntry,
-} from "../api/utils";
+import { useGetTmdbDetails } from "../api/utils";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MovieDetails } from "@lorenzopant/tmdb";
 import { format } from "date-fns";
 import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuration";
+import { useUpdateWatchlistEntry } from "../api/watchlist";
 
 export type MovieCard = {
   movieId: number;
-  fetchAndSetWatchlist: () => Promise<void>;
   setSelectedMovie: Dispatch<SetStateAction<MovieDetails | null>>;
   tmdbConfigLoading: boolean;
   tmdbConfig: ConfigurationResponse | null;
@@ -28,26 +24,20 @@ export type MovieCard = {
 
 export const MovieCard = ({
   movieId,
-  fetchAndSetWatchlist,
   setSelectedMovie,
   tmdbConfigLoading,
   tmdbConfig,
 }: MovieCard) => {
   const { status: getDetailsStatus, attemptGet } = useGetTmdbDetails();
-  const { status: updateWatchlistStatus, attemptUpdate } =
-    useUpdateWatchlistEntry();
+  const { isPending, data: watchlist, mutateAsync } = useUpdateWatchlistEntry();
   const [details, setDetails] = useState<MovieDetails>();
 
   const handleRemoveClick = async (movieId: number) => {
     try {
-      const input: UpdateWatchlistEntryInput = {
+      await mutateAsync({
         movieId,
         action: "remove",
-      };
-      const result = await attemptUpdate(input);
-      console.log("result:", result);
-      // Fire a refresh of the full watchlist. Must be passed down.
-      fetchAndSetWatchlist();
+      });
     } catch (err) {
       console.error("rating error:", err);
     }
@@ -96,7 +86,7 @@ export const MovieCard = ({
           <CardActions sx={{ marginTop: "auto" }}>
             <Button
               onClick={() => handleRemoveClick(movieId)}
-              loading={updateWatchlistStatus === "loading"}
+              loading={isPending}
               loadingPosition="start"
               size="small"
               variant="outlined"

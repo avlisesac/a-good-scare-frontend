@@ -1,48 +1,30 @@
-import { useEffect, useState } from "react";
-import { useGetFullWatchlist, WatchlistEntry } from "../api/utils";
+import { useState } from "react";
 import { MovieCard } from "../ui/MovieCard";
 import { CircularProgress, Dialog, Grid, Typography } from "@mui/material";
 import { MovieDetails } from "@lorenzopant/tmdb";
 import { MovieDetailsScreen } from "../movies/MovieDetailsScreen";
 import { useTMDBConfig } from "../context/TMDBConfigContext";
+import { useWatchlist } from "../api/watchlist";
 
 export const Watchlist = () => {
-  const [watchlist, setWatchlist] = useState<WatchlistEntry[]>([]);
-  const { status, attemptGet } = useGetFullWatchlist();
+  const { data: watchlist, isPending } = useWatchlist();
   const [selectedMovie, setSelectedMovie] = useState<MovieDetails | null>(null);
   const { tmdbConfig, loading: tmdbConfigLoading } = useTMDBConfig();
 
-  const fetchAndSetWatchlist = async () => {
-    try {
-      const result = await attemptGet();
-      if (result) {
-        setWatchlist(result);
-        setSelectedMovie(null);
-      }
-    } catch (err) {
-      console.error("error with initial watchlist fetch:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchAndSetWatchlist();
-  }, []);
-
-  if (status === "loading") {
+  if (isPending) {
     return <CircularProgress />;
   }
 
   return (
     <>
       <Typography variant="h1">Watchlist</Typography>
-      {watchlist.length === 0 && <h2>Your watchlist is currently empty</h2>}
-      {watchlist.length > 0 && (
+      {watchlist?.length === 0 && <h2>Your watchlist is currently empty</h2>}
+      {watchlist && watchlist.length > 0 && (
         <Grid container spacing={2}>
           {watchlist.map((entry) => (
             <MovieCard
               movieId={entry.movieId}
               key={entry.movieId}
-              fetchAndSetWatchlist={fetchAndSetWatchlist}
               setSelectedMovie={setSelectedMovie}
               tmdbConfigLoading={tmdbConfigLoading}
               tmdbConfig={tmdbConfig}
@@ -52,11 +34,7 @@ export const Watchlist = () => {
       )}
       <Dialog onClose={() => setSelectedMovie(null)} open={!!selectedMovie}>
         {selectedMovie && tmdbConfig && (
-          <MovieDetailsScreen
-            movie={selectedMovie}
-            tmdbConfig={tmdbConfig}
-            fetchAndSetWatchlist={fetchAndSetWatchlist}
-          />
+          <MovieDetailsScreen movie={selectedMovie} tmdbConfig={tmdbConfig} />
         )}
       </Dialog>
     </>
