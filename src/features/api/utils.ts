@@ -47,6 +47,7 @@ export type MovieReview = DBDateFields & {
   reviewContainsSpoiler: boolean | null;
   userId: string;
   username: string;
+  rating: MovieRatingOptions;
 };
 
 export type GetWatchlistEntryInput = {
