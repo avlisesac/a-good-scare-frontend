@@ -29,7 +29,7 @@ export const MovieCard = ({
   tmdbConfig,
 }: MovieCard) => {
   const { status: getDetailsStatus, attemptGet } = useGetTmdbDetails();
-  const { isPending, data: watchlist, mutateAsync } = useUpdateWatchlistEntry();
+  const { isPending, mutateAsync } = useUpdateWatchlistEntry();
   const [details, setDetails] = useState<MovieDetails>();
 
   const handleRemoveClick = async (movieId: number) => {

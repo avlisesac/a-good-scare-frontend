@@ -12,41 +12,32 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import {
-  GetAllReviewsForMovieInput,
-  MovieReview,
-  useGetAllReviewsForMovie,
-  UserRating,
-  useSubmitReview,
-} from "../api/utils";
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { useAuth } from "../context/AuthContext";
 import { MovieReviewInput } from "./MovieReviewInput";
-import { AsyncActionStatus } from "../api/useAsyncAction";
+import { MovieReview, useSubmitMovieReview } from "../api/reviews";
+import { UserRating } from "../api/ratings";
 
 type MovieReviewsProps = {
   movieId: number;
-  userRating: UserRating | null;
-  getAllReviewsStatus: AsyncActionStatus;
+  userRating?: UserRating;
+  fetchingAllReviews: boolean;
+  allReviewsFetched: boolean;
   loggedInUsersReview?: MovieReview;
   movieReviews: MovieReview[];
-  attemptGetReviews: (
-    input: GetAllReviewsForMovieInput
-  ) => Promise<MovieReview[]>;
-  getAndSetMovieReviews: (movieId: number) => Promise<void>;
 };
 
 export const MovieReviews = ({
   movieId,
   userRating,
-  getAllReviewsStatus,
+  fetchingAllReviews,
+  allReviewsFetched,
   loggedInUsersReview,
   movieReviews,
-  attemptGetReviews,
-  getAndSetMovieReviews,
 }: MovieReviewsProps) => {
-  const { attemptReview, status: submitReviewStatus } = useSubmitReview();
+  const { mutateAsync, isPending: submitReviewPending } =
+    useSubmitMovieReview();
   const { user } = useAuth();
   const [reviewFieldDisabled, setReviewFieldDisabled] = useState<boolean>(true);
   const [reviewFieldLabel, setReviewFieldLabel] = useState("");
@@ -55,12 +46,10 @@ export const MovieReviews = ({
 
   const submitMovieReview = async (movieId: number, reviewText: string) => {
     try {
-      const newReview = await attemptReview({
+      await mutateAsync({
         movieId,
         review: reviewText,
       });
-      console.log("newReview:", newReview);
-      getAndSetMovieReviews(movieId);
       setEditingReview(false);
     } catch (err) {
       console.error("error submitting review:", err);
@@ -86,15 +75,13 @@ export const MovieReviews = ({
     }
   }, [user, loggedInUsersReview, userRating]);
 
-  useEffect(() => {}, []);
-
   return (
     <>
       <Typography variant="h4">Reviews</Typography>
       {!loggedInUsersReview && (
         <MovieReviewInput
-          disabled={reviewFieldDisabled || getAllReviewsStatus === "loading"}
-          loading={submitReviewStatus === "loading"}
+          disabled={reviewFieldDisabled || fetchingAllReviews}
+          loading={submitReviewPending}
           label={reviewFieldLabel}
           movieId={movieId}
           editingReview={editingReview}
@@ -103,8 +90,8 @@ export const MovieReviews = ({
           setEditingReview={setEditingReview}
         />
       )}
-      {getAllReviewsStatus === "loading" && <CircularProgress />}
-      {getAllReviewsStatus === "success" &&
+      {fetchingAllReviews && <CircularProgress />}
+      {allReviewsFetched &&
         (movieReviews?.length ? (
           <Grid container gap={2} sx={{ marginTop: 2 }}>
             {movieReviews.map((review) => {
@@ -113,7 +100,7 @@ export const MovieReviews = ({
                 return (
                   <MovieReviewInput
                     disabled={reviewFieldDisabled}
-                    loading={submitReviewStatus === "loading"}
+                    loading={submitReviewPending}
                     label={reviewFieldLabel}
                     movieId={movieId}
                     editingReview={editingReview}
@@ -134,7 +121,6 @@ export const MovieReviews = ({
                   variant={isLoggedInUsersReview ? "outlined" : "elevation"}
                 >
                   <CardContent>
-                    {/* <Grid container sx={{ gap: 2 }}> */}
                     <Box
                       sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}
                     >
@@ -146,7 +132,6 @@ export const MovieReviews = ({
                       <Typography variant="body1">
                         {review.reviewText}
                       </Typography>
-                      {/* TODO - Add this user's rating of the movie with their review */}
                     </Box>
                     <Typography sx={{ paddingTop: 2 }} variant="subtitle2">
                       by {review.username} on{" "}
@@ -158,7 +143,6 @@ export const MovieReviews = ({
                           )})`
                         : ""}
                     </Typography>
-                    {/* </Grid> */}
                     {isLoggedInUsersReview && (
                       <CardActions>
                         <Button

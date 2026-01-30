@@ -3,18 +3,12 @@ import { ConfigurationResponse } from "@lorenzopant/tmdb/dist/types/configuratio
 import { Card, CardContent, CardMedia, Typography } from "@mui/material";
 import { format } from "date-fns";
 import { RateButton } from "../ui/RateButton";
-import {
-  MovieReview,
-  useGetAllReviewsForMovie,
-  useGetMovieRating,
-  useGetUserRating,
-  UserRating,
-} from "../api/utils";
-import { useEffect, useState } from "react";
 import { OverallRating } from "../ui/OverallRating";
 import { WatchlistButton } from "../ui/WatchlistButton";
 import { MovieReviews } from "./MovieReviews";
 import { useAuth } from "../context/AuthContext";
+import { useMovieReviews } from "../api/reviews";
+import { useMoviesAverateRating, useUsersRatingForMovie } from "../api/ratings";
 
 export type MovieDetailsProps = {
   movie: MovieResultItem | MovieDetails;
@@ -25,60 +19,25 @@ export const MovieDetailsScreen = ({
   movie,
   tmdbConfig,
 }: MovieDetailsProps) => {
-  const { result, status, attemptGet: attemptGetRating } = useGetMovieRating();
-  const { attemptGet: attemptGetReviews, status: getAllReviewsStatus } =
-    useGetAllReviewsForMovie();
-  const { status: getUserRatingStatus, attemptGet: attemptGetUserRating } =
-    useGetUserRating();
   const { user, initialFetchLoading, authLoading } = useAuth();
-  const loadingUser = initialFetchLoading || authLoading;
-  const [userRating, setUserRating] = useState<UserRating | null>(null);
-  const [movieReviews, setMovieReviews] = useState<MovieReview[]>([]);
-  const [loggedInUsersReview, setLoggedInUsersReview] = useState<MovieReview>();
-
-  const userRatingFetch = async (userId: string) => {
-    try {
-      const result = await attemptGetUserRating({
-        userId: userId,
-        movieId: movie.id,
-      });
-      setUserRating(result);
-    } catch (err) {
-      console.error("error with initial rating data fetch:", err);
-    }
-  };
-
-  const getAndSetMovieReviews = async (movieId: number) => {
-    try {
-      const result = await attemptGetReviews({ movieId });
-      console.log("reviews:", result);
-      const loggedInUsersReview = result?.find(
-        (review) => review.userId === user?.id
-      );
-      console.log("loggedInUsersReview:", loggedInUsersReview);
-      setLoggedInUsersReview(loggedInUsersReview);
-      setMovieReviews(result);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      userRatingFetch(user.id);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    console.log("result:", result);
-  }, [result]);
-
-  useEffect(() => {
-    attemptGetRating({
+  const { data: averageRating, isFetching: fetchingMoviesAverageRating } =
+    useMoviesAverateRating({
       movieId: movie.id,
     });
-    getAndSetMovieReviews(movie.id);
-  }, []);
+  const {
+    data: reviews,
+    isFetching: fetchingAllReviews,
+    isSuccess: allReviewsFetched,
+  } = useMovieReviews({
+    movieId: movie.id,
+  });
+  const { data: userRating, isFetching: fetchingUsersRatingForMovie } =
+    useUsersRatingForMovie({ movieId: movie.id, userId: user?.id });
+  const loadingUser = initialFetchLoading || authLoading;
+
+  const loggedInUsersReview = reviews?.find(
+    (review) => review.userId === user?.id
+  );
 
   return (
     <Card sx={{ maxWidth: 500, maxHeight: "80%", overflow: "scroll", p: 2 }}>
@@ -98,17 +57,15 @@ export const MovieDetailsScreen = ({
           </Typography>
         )}
         <OverallRating
-          rating={result?.average}
-          loading={status === "loading"}
+          rating={averageRating?.average}
+          loading={fetchingMoviesAverageRating}
         />
         <RateButton
           movieId={movie.id}
-          refetchAverage={attemptGetRating}
+          user={user}
           userRating={userRating}
-          setUserRating={setUserRating}
           loadingUser={loadingUser}
-          fetchRatingStatus={getUserRatingStatus}
-          getAndSetMovieReviews={getAndSetMovieReviews}
+          fetchingUsersRatingForMovie={fetchingUsersRatingForMovie}
         />
         <Typography variant="body2" sx={{ paddingTop: 2 }}>
           {movie.overview}
@@ -116,11 +73,10 @@ export const MovieDetailsScreen = ({
         <MovieReviews
           movieId={movie.id}
           userRating={userRating}
-          getAllReviewsStatus={getAllReviewsStatus}
+          fetchingAllReviews={fetchingAllReviews}
+          allReviewsFetched={allReviewsFetched}
           loggedInUsersReview={loggedInUsersReview}
-          movieReviews={movieReviews}
-          attemptGetReviews={attemptGetReviews}
-          getAndSetMovieReviews={getAndSetMovieReviews}
+          movieReviews={reviews || []}
         />
       </CardContent>
     </Card>

@@ -47,6 +47,9 @@ export const MovieSearch = () => {
 
   useEffect(() => {
     attemptConfig();
+    const handler = () => setSelectedMovie(null);
+    window.addEventListener("auth:expired", handler);
+    return () => window.removeEventListener("auth:expired", handler);
   }, []);
 
   return (
