@@ -1,40 +1,36 @@
 import { Box, Button } from "@mui/material";
 import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import {
-  MovieRatingOptions,
-  UserRating,
-  RateMovieInput,
-  useRateMovie,
-  MovieRating,
-  GetMovieRatingInput,
-} from "../api/utils";
-import { Dispatch, SetStateAction } from "react";
-import { AsyncActionStatus } from "../api/useAsyncAction";
+import { MovieRatingOptions } from "../api/utils";
+import { RateMovieInput, useRateMovie, UserRating } from "../api/ratings";
+import { User } from "../../types/User";
+import toast from "react-hot-toast";
+import { QueryStatus } from "@tanstack/react-query";
 
 type RateButtonProps = {
   movieId: number;
-  userRating: UserRating | null;
-  setUserRating: Dispatch<SetStateAction<UserRating | null>>;
+  userRating?: UserRating;
+  user?: User | null;
   loadingUser: boolean;
-  fetchRatingStatus: AsyncActionStatus;
-  refetchAverage: (input: GetMovieRatingInput) => Promise<MovieRating>;
-  getAndSetMovieReviews: (movieId: number) => Promise<void>;
+  fetchingUsersRatingForMovie: boolean;
 };
 
 export const RateButton = ({
   movieId,
-  refetchAverage,
   userRating,
-  setUserRating,
+  user,
   loadingUser,
-  fetchRatingStatus,
-  getAndSetMovieReviews,
+  fetchingUsersRatingForMovie,
 }: RateButtonProps) => {
-  const { attemptRate, status } = useRateMovie();
-  const buttonDisablingStatuses = [status, fetchRatingStatus];
+  const { mutateAsync, isPending: ratingPending } = useRateMovie();
+
+  const anyApiLoading = fetchingUsersRatingForMovie || ratingPending;
 
   const handleRateClick = async (rating: MovieRatingOptions) => {
+    if (!user) {
+      toast.error("You must be logged in to rate a movie!");
+      return;
+    }
     let finalRating: MovieRatingOptions = rating;
     const currentRating = userRating?.rating;
     if (currentRating && currentRating === rating) {
@@ -44,12 +40,9 @@ export const RateButton = ({
       const ratingInput: RateMovieInput = {
         movieId: movieId,
         rating: finalRating,
+        userId: user.id,
       };
-      const result = await attemptRate(ratingInput);
-      console.log("result:", result);
-      setUserRating(result);
-      refetchAverage({ movieId });
-      getAndSetMovieReviews(movieId);
+      await mutateAsync(ratingInput);
     } catch (err) {
       console.error("rating error:", err);
     }
@@ -60,7 +53,7 @@ export const RateButton = ({
       <Button
         variant={userRating?.rating === "pos" ? "contained" : "outlined"}
         disabled={loadingUser}
-        loading={buttonDisablingStatuses.includes("loading")}
+        loading={anyApiLoading}
         loadingPosition="start"
         onClick={() => handleRateClick("pos")}
         startIcon={<ThumbUpIcon />}
@@ -70,7 +63,7 @@ export const RateButton = ({
       <Button
         variant={userRating?.rating === "neg" ? "contained" : "outlined"}
         disabled={loadingUser}
-        loading={buttonDisablingStatuses.includes("loading")}
+        loading={anyApiLoading}
         loadingPosition="start"
         onClick={() => handleRateClick("neg")}
         endIcon={<ThumbDownIcon />}

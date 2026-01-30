@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MovieCard } from "../ui/MovieCard";
 import { CircularProgress, Dialog, Grid, Typography } from "@mui/material";
 import { MovieDetails } from "@lorenzopant/tmdb";
@@ -14,6 +14,12 @@ export const Watchlist = () => {
   const { data: watchlist, isLoading } = useWatchlist(canFetchWatchlist);
   const [selectedMovie, setSelectedMovie] = useState<MovieDetails | null>(null);
   const { tmdbConfig, loading: tmdbConfigLoading } = useTMDBConfig();
+
+  useEffect(() => {
+    const handler = () => setSelectedMovie(null);
+    window.addEventListener("auth:expired", handler);
+    return () => window.removeEventListener("auth:expired", handler);
+  }, []);
 
   if (isLoading) {
     return <CircularProgress />;

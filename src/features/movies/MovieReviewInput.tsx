@@ -12,7 +12,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { MovieReview } from "../api/utils";
+import { MovieReview } from "../api/reviews";
 
 export type MovieReviewInputProps = {
   disabled: boolean;
@@ -61,7 +61,16 @@ export const MovieReviewInput = ({
           value={reviewText}
           onChange={handleReviewTextChange}
           rows={3}
-          sx={{ width: "100%", color: "#000" }}
+          sx={{
+            width: "100%",
+            color: "#000",
+            "& .MuiInputBase-input": {
+              color: "#000",
+            },
+            "& .MuiInputLabel-root": {
+              color: "#000",
+            },
+          }}
         />
         <CardActions>
           <Button

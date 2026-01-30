@@ -2,13 +2,13 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router";
 import { Home } from "./features/screens/Home";
 import { Register } from "./features/auth/Register";
 import { Login } from "./features/auth/Login";
 import { Protected } from "./features/screens/Protected";
 import { AGSAppBar } from "./features/ui/AGSAppBar";
-import { AuthProvider } from "./features/context/AuthContext";
+import { AuthProvider, useAuth } from "./features/context/AuthContext";
 import { Watchlist } from "./features/screens/Watchlist";
 import { TMDBConfigProvider } from "./features/context/TMDBConfigContext";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -21,6 +21,7 @@ import {
 } from "@tanstack/react-query";
 import toast, { Toaster } from "react-hot-toast";
 import { isAxiosError } from "axios";
+import { AuthExpiryListener } from "./features/auth/AuthExpiryListener";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -54,6 +55,10 @@ export const queryClient = new QueryClient({
   }),
   mutationCache: new MutationCache({
     onError: (error) => {
+      if (isAxiosError(error)) {
+        window.dispatchEvent(new Event("auth:expired"));
+        return;
+      }
       toast.error(getErrorMessage(error));
     },
   }),
@@ -68,6 +73,7 @@ root.render(
             <CssBaseline />
             <Toaster position="bottom-left" />
             <BrowserRouter>
+              <AuthExpiryListener />
               <Routes>
                 <Route element={<AGSAppBar />}>
                   <Route index element={<Home />} />
