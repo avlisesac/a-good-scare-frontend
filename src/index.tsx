@@ -24,7 +24,7 @@ import { isAxiosError } from "axios";
 import { AuthExpiryListener } from "./features/auth/AuthExpiryListener";
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );
 
 export const getErrorMessage = (error: unknown): string => {
@@ -38,8 +38,6 @@ export const getErrorMessage = (error: unknown): string => {
   if (typeof error === "string") return error;
   return "Something went wrong. Please try again";
 };
-
-// TODO: Move rating and review queries/mutations to the tanstack setup
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -88,7 +86,7 @@ root.render(
         </TMDBConfigProvider>
       </AuthProvider>
     </QueryClientProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function

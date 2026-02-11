@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { RegistrationInput, useRegister } from "../api/utils";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 
 const emailExistsError = "This email address is already in use.";
@@ -28,6 +29,7 @@ export const Register = () => {
   const [registerError, setRegisterError] = useState<String | null>(null);
   const navigate = useNavigate();
 
+  // TODO - move registration actions to tanstack
   const submit = async (data: RegistrationInput) => {
     try {
       const result = await attemptRegister({
@@ -36,6 +38,9 @@ export const Register = () => {
         password: data.password,
       });
       console.log("registration result:", result);
+      toast.success(
+        "Registration successful! Please log in with your new account.",
+      );
       navigate("/login");
     } catch (err) {
       console.error("registrationError:", err);
