@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useGetTmdbConfig, useSearchMovies } from "../api/utils";
 import { MovieResultItem } from "@lorenzopant/tmdb";
 import { MovieDetailsScreen } from "../movies/MovieDetailsScreen";
+import { MovieSearchResultCard } from "./MovieSearchResultCard";
 
 export const MovieSearch = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -75,17 +76,9 @@ export const MovieSearch = () => {
               setSelectedMovie(option);
             }}
           >
-            <Box
-              component="img"
-              sx={{ width: 92 }}
-              src={`${tmdbConfig?.images.base_url}${tmdbConfig?.images.poster_sizes[0]}/${option.poster_path}`}
-            />
-            <ListItemText
-              primary={`${option.title}${
-                option.release_date
-                  ? ` - (${format(option.release_date, "y")})`
-                  : ""
-              }`}
+            <MovieSearchResultCard
+              resultItem={option}
+              tmdbConfig={tmdbConfig}
             />
           </ListItem>
         )}
