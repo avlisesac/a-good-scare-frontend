@@ -36,8 +36,10 @@ export const MovieDetailsScreen = ({
   const loadingUser = initialFetchLoading || authLoading;
 
   const loggedInUsersReview = reviews?.find(
-    (review) => review.userId === user?.id
+    (review) => review.userId === user?.id,
   );
+
+  console.log("movie:", movie);
 
   return (
     <Card sx={{ maxWidth: 500, maxHeight: "80%", overflow: "scroll", p: 2 }}>

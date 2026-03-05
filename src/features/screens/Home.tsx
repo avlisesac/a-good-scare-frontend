@@ -3,141 +3,190 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
+  Dialog,
   Grid,
   Typography,
 } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router";
+import { useList } from "../api/lists";
+import { MovieCard } from "../ui/MovieCard";
+import { useState } from "react";
+import { MovieDetails } from "@lorenzopant/tmdb";
+import { MovieDetailsScreen } from "../movies/MovieDetailsScreen";
+import { useTMDBConfig } from "../context/TMDBConfigContext";
+import { constructCardText, constructImageURL } from "../../utils";
 
 export const Home = () => {
   const { user, initialFetchLoading, authLoading, logout } = useAuth();
+  const [selectedMovie, setSelectedMovie] = useState<MovieDetails | null>(null);
   const loadingUser = initialFetchLoading || authLoading;
+  const { data: list, isFetching: listIsFetching } = useList({
+    id: `62d9a4a5-ce40-4160-9678-4963dddde3bf`,
+  });
+  const { tmdbConfig, loading: tmdbConfigLoading } = useTMDBConfig();
   const navigate = useNavigate();
 
   return (
-    <Grid container spacing={2}>
-      <Grid size={12}>
-        <Typography variant="h2" sx={{ textAlign: "center" }}>
-          Welcome to
-        </Typography>
-      </Grid>
-      <Grid size={12}>
-        <Typography color="primary" variant="h1" sx={{ textAlign: "center" }}>
-          A Good Scare
-        </Typography>
-      </Grid>
-      <Grid size={12}>
-        <Typography variant="h4" sx={{ textAlign: "center" }}>
-          A rating and review site for horror fans.
-        </Typography>
-      </Grid>
-      <Grid>
-        <Alert variant="filled" severity="warning">
-          Notice: This site is currently on a free hosting instance. Due to
-          this, initial requests may take a while to resolve after periods of
-          inactivity. This may take up to one minute, but subsequent requests
-          will not suffer this delay.
-        </Alert>
-      </Grid>
-      {!user && (
-        <Grid
-          sx={{
-            display: "flex",
-            gap: 2,
-            flex: 1,
-            justifyContent: "center",
-          }}
-        >
-          <Button
-            variant="contained"
-            size="large"
-            color="secondary"
-            loading={loadingUser}
-            loadingPosition="start"
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </Button>
-          <Button
-            variant="contained"
-            size="large"
-            color="secondary"
-            loading={loadingUser}
-            loadingPosition="start"
-            onClick={() => navigate("/register")}
-          >
-            Register
-          </Button>
+    <>
+      <Grid container spacing={2}>
+        <Grid size={12}>
+          <Typography variant="h2" sx={{ textAlign: "center" }}>
+            Welcome to
+          </Typography>
         </Grid>
-      )}
-      <Grid size={12}>
-        <Card>
-          <CardContent
-            sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        <Grid size={12}>
+          <Typography color="primary" variant="h1" sx={{ textAlign: "center" }}>
+            A Good Scare
+          </Typography>
+        </Grid>
+        <Grid size={12}>
+          <Typography variant="h4" sx={{ textAlign: "center" }}>
+            A rating and review site for horror fans.
+          </Typography>
+        </Grid>
+        {!user && (
+          <Grid
+            sx={{
+              display: "flex",
+              gap: 2,
+              flex: 1,
+              justifyContent: "center",
+            }}
           >
-            <Typography variant="body1" sx={{ textAlign: "center" }}>
-              Horror fans know that we have different criteria for what makes a
-              good horror flick than the general moviegoer. While there are
-              ample movie review sites out there, we want to give the gorehound
-              and the spooklover the chance to get reviews from likeminded
-              creeps. And, while horror-leaning streaming services exist and
-              allow for ratings and reviews, they're limited to the content that
-              the platform currently has licensed.
-            </Typography>
-            <Typography
-              color="primary"
-              variant="h6"
-              sx={{
-                fontFamily: ["Archivo Black", "sans-serif"].join(", "),
-                textAlign: "center",
-              }}
-            >
-              Enter: "A Good Scare"!
-            </Typography>
-            <Typography sx={{ textAlign: "center" }}>
-              We let you rate on a simple metric that other horror watchers
-              appreciate: "Check it out!" or "Skip it." Feel like you've got
-              something to say? Leave a review! Come across a movie you've been
-              meaning to get to? Add it to your watchlist.
-            </Typography>
-            <Typography
+            <Button
+              variant="contained"
+              size="large"
               color="secondary"
-              sx={{
-                fontFamily: ["Archivo Black", "sans-serif"].join(", "),
-                textAlign: "center",
-              }}
+              loading={loadingUser}
+              loadingPosition="start"
+              onClick={() => navigate("/login")}
             >
-              "A Good Scare" aims to be your horror movie sidekick to help you
-              get the most out of your darker viewing.
-            </Typography>
-          </CardContent>
-        </Card>
-      </Grid>
-      {user && (
-        <Grid>
-          <Typography>Features coming soon:</Typography>
-          <ul>
-            <li>Spoiler tags for reviews</li>
-            <li>Ability to delete a review that you've left</li>
-            <li>Personal rate/review activity list</li>
-            <li>
-              On homescreen:
-              <ul>
-                <li>Highest rated movies</li>
-                <li>Most rated movies</li>
-                <li>Most reviewed movies</li>
-              </ul>
-            </li>
-            <li>
-              Random horror movie suggester w/ ability to narrow by:
-              <ul>
-                <li>Decade</li>
-                <li>Country</li>
-              </ul>
-            </li>
-          </ul>
+              Login
+            </Button>
+            <Button
+              variant="contained"
+              size="large"
+              color="secondary"
+              loading={loadingUser}
+              loadingPosition="start"
+              onClick={() => navigate("/register")}
+            >
+              Register
+            </Button>
+          </Grid>
+        )}
+        <Grid size={12}>
+          <Card>
+            <CardContent
+              sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+            >
+              <Typography variant="body1" sx={{ textAlign: "center" }}>
+                Horror fans know that we have different criteria for what makes
+                a good horror flick than the general moviegoer. While there are
+                ample movie review sites out there, we want to give the
+                gorehound and the spooklover the chance to get reviews from
+                likeminded creeps. And, while horror-leaning streaming services
+                exist and allow for ratings and reviews, they're limited to the
+                content that the platform currently has licensed.
+              </Typography>
+              <Typography
+                color="primary"
+                variant="h6"
+                sx={{
+                  fontFamily: ["Archivo Black", "sans-serif"].join(", "),
+                  textAlign: "center",
+                }}
+              >
+                Enter: "A Good Scare"!
+              </Typography>
+              <Typography sx={{ textAlign: "center" }}>
+                We let you rate on a simple metric that other horror watchers
+                appreciate: "Check it out!" or "Skip it." Feel like you've got
+                something to say? Leave a review! Come across a movie you've
+                been meaning to get to? Add it to your watchlist.
+              </Typography>
+              <Typography
+                color="secondary"
+                sx={{
+                  fontFamily: ["Archivo Black", "sans-serif"].join(", "),
+                  textAlign: "center",
+                }}
+              >
+                "A Good Scare" aims to be your horror movie sidekick to help you
+                get the most out of your darker viewing.
+              </Typography>
+            </CardContent>
+          </Card>
         </Grid>
-      )}
-    </Grid>
+        <Grid size={12}>
+          <Grid container spacing={2}>
+            {(listIsFetching || tmdbConfigLoading) && <CircularProgress />}
+            {!listIsFetching && list && tmdbConfig && (
+              <>
+                <Grid size={12}>
+                  <Typography variant="h1" textAlign="center">
+                    {list.name}
+                  </Typography>
+                </Grid>
+                {list.items.map((item) => {
+                  const { average, movie, id: listItemId } = item;
+                  const imgURL = constructImageURL({
+                    tmdbConfig,
+                    sizePos: 1,
+                    posterPath: movie.poster_path,
+                  });
+                  const cardText = constructCardText(
+                    movie.title,
+                    movie.release_date,
+                  );
+
+                  return (
+                    <MovieCard
+                      key={listItemId}
+                      cardClickAction={() => setSelectedMovie(movie)}
+                      imgURL={imgURL}
+                      cardText={cardText}
+                      average={average}
+                    />
+                  );
+                })}
+              </>
+            )}
+          </Grid>
+        </Grid>
+        {user && (
+          <Grid>
+            <Typography>Features coming soon:</Typography>
+            <ul>
+              <li>Spoiler tags for reviews</li>
+              <li>Ability to delete a review that you've left</li>
+              <li>Personal rate/review activity list</li>
+              <li>
+                On homescreen:
+                <ul>
+                  <li>Highest rated movies</li>
+                  <li>Most rated movies</li>
+                  <li>Most reviewed movies</li>
+                </ul>
+              </li>
+              <li>
+                Random horror movie suggester w/ ability to narrow by:
+                <ul>
+                  <li>Decade</li>
+                  <li>Country</li>
+                </ul>
+              </li>
+            </ul>
+          </Grid>
+        )}
+      </Grid>
+      <Dialog onClose={() => setSelectedMovie(null)} open={!!selectedMovie}>
+        {selectedMovie && tmdbConfig && (
+          <MovieDetailsScreen movie={selectedMovie} tmdbConfig={tmdbConfig} />
+        )}
+      </Dialog>
+    </>
   );
 };
