@@ -20,6 +20,10 @@ export type DBDateFields = {
   deletedAt?: string;
 };
 
+export type DefaultTableProperties = DBDateFields & {
+  id: string;
+};
+
 export type MovieRatingOptions = "pos" | "neg" | null;
 
 type RegistrationResponse = {};
@@ -36,7 +40,7 @@ console.log("api base url:", api.defaults.baseURL);
 const tmdb = new TMDB(process.env.REACT_APP_TMDB_ACCESS_TOKEN ?? "");
 
 export const register = async (
-  input: RegistrationInput
+  input: RegistrationInput,
 ): Promise<RegistrationResponse> => {
   const configuration: AxiosRequestConfig = {
     method: "post",
@@ -62,14 +66,14 @@ export const login = async (input: LoginInput): Promise<AxiosResponse> => {
 };
 
 export const searchMovies = async (
-  query: string
+  query: string,
 ): Promise<MovieResultItem[]> => {
   const response = await tmdb.search.movies({ query });
   return response.results;
 };
 
 export const getTmdbMovieDetails = async (
-  movieId: number
+  movieId: number,
 ): Promise<MovieDetails> => {
   const response = await tmdb.movies.details({ movie_id: movieId });
   return response;
@@ -82,7 +86,7 @@ export const getTmdbConfig = async (): Promise<ConfigurationResponse> => {
 
 export const useLogin = () => {
   const { execute, ...state } = useAsyncAction<LoginInput, AxiosResponse>(
-    login
+    login,
   );
   return { ...state, attemptLogin: execute };
 };
@@ -97,21 +101,21 @@ export const useRegister = () => {
 
 export const useSearchMovies = () => {
   const { execute, ...state } = useAsyncAction<string, MovieResultItem[]>(
-    searchMovies
+    searchMovies,
   );
   return { ...state, attemptSearch: execute };
 };
 
 export const useGetTmdbDetails = () => {
   const { execute, ...state } = useAsyncAction<number, MovieDetails>(
-    getTmdbMovieDetails
+    getTmdbMovieDetails,
   );
   return { ...state, attemptGet: execute };
 };
 
 export const useGetTmdbConfig = () => {
   const { execute, ...state } = useAsyncAction<void, ConfigurationResponse>(
-    getTmdbConfig
+    getTmdbConfig,
   );
   return { ...state, attemptConfig: execute };
 };

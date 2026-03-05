@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MovieCard } from "../ui/MovieCard";
+import { WatchlistCard } from "../ui/WatchlistCard";
 import { CircularProgress, Dialog, Grid, Typography } from "@mui/material";
 import { MovieDetails } from "@lorenzopant/tmdb";
 import { MovieDetailsScreen } from "../movies/MovieDetailsScreen";
@@ -32,7 +32,7 @@ export const Watchlist = () => {
       {watchlist && watchlist.length > 0 && (
         <Grid container spacing={2}>
           {watchlist.map((entry) => (
-            <MovieCard
+            <WatchlistCard
               movieId={entry.movieId}
               key={entry.movieId}
               setSelectedMovie={setSelectedMovie}
