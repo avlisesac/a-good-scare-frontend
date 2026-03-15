@@ -135,7 +135,7 @@ export const Home = () => {
                   const imgURL = constructImageURL({
                     tmdbConfig,
                     sizePos: 1,
-                    posterPath: movie.poster_path,
+                    posterPath: movie.poster_path || "",
                   });
                   const cardText = constructCardText(
                     movie.title,
