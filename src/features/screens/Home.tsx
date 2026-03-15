@@ -132,6 +132,7 @@ export const Home = () => {
                 </Grid>
                 {list.items.map((item) => {
                   const { average, movie, id: listItemId } = item;
+                  if (!movie) return null;
                   const imgURL = constructImageURL({
                     tmdbConfig,
                     sizePos: 1,
